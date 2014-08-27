@@ -7,8 +7,7 @@
 #include "logx/config.hpp"
 #include "logx/log.hpp"
 #include "logx/tag.hpp"
-
-
+#include "logx/stdtags.hpp"
 
 
 
