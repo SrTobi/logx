@@ -12,7 +12,7 @@ namespace logx {
 		{
 			std::wstring _result;
 
-			for (auto it = _str.begin(); it != _str.end(); ++it)
+			for (auto it = _str.begin(); it != _str.end();)
 			{
 				if (*it == L'$' && std::next(it) != _str.end())
 				{
@@ -36,10 +36,12 @@ namespace logx {
 					}
 					else{
 						_result.push_back(L'$');
+						++it;
 					}
 				}
 				else{
 					_result.push_back(*it);
+					++it;
 				}
 			}
 
