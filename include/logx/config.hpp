@@ -26,12 +26,13 @@
 
 #endif
 
+#define _LOGXW(_text) L##_text
+#define LOGXW(_text) _LOGXW(_text)
 
 #ifdef LOGXCFG_FORCE_WCHAR
-#	define _LOGXW(_text) L##_text
-#	define LOGXW(_text) _LOGXW(_text)
+#	define LOGXTXT(_text) LOGW(_text)
 #else
-#	define LOGXW(_text) _text
+#	define LOGXTXT(_text) _text
 #endif
 
 

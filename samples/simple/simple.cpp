@@ -5,10 +5,19 @@
 #include <logx/sink.hpp>
 
 
+
+logxTAG(
+	TestTag,
+	(
+		std::to_wstring(std::get<0>(_args))
+	),
+	int
+);
+
 int main()
 {
 	std::vector<int> vec = { 1, 2, 3 };
-	logx::log("here comes a string: $1", vec);
+	logx::log("here comes a string: $1", TestTag(4));
 
 	logx::log("here comes a string: $1, $2, $3", 1.0f, "test", L"wie gehts");
 
