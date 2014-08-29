@@ -92,6 +92,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 # tests must come first
 add_subdirectory("include")
 add_subdirectory("samples")
+add_subdirectory("tests")
 
 
 ################### setup documentation target ###################

@@ -1,0 +1,10 @@
+
+include_directories(.)
+SCAN_SOURCE_HERE(TEST_SOURCE "cpp;hpp")
+
+AUTO_SOURCE_GROUP("${TEST_SOURCE}")
+AUTO_SOURCE_GROUP("${LOGX_INCLUDE_FILES}")
+
+add_executable(logx-tests ${TEST_SOURCE} ${LOGX_INCLUDE_FILES})
+SET_TARGET_PROPERTIES(logx-tests PROPERTIES COMPILE_DEFINITIONS "LOGX_TEST")
+target_link_libraries(logx-tests ${Boost_LIBRARIES})
