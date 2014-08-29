@@ -2,6 +2,7 @@
 #ifndef _LOGX_STDTAGS_HPP
 #define _LOGX_STDTAGS_HPP
 
+#include <thread>
 #include "tag.hpp"
 
 
@@ -101,6 +102,39 @@ namespace logx {
 		static log_level warning(details::_log_level::WARNING);
 		static log_level error(details::_log_level::ERROR);
 		static log_level fatal(details::_log_level::FATAL);
+		
+
+		/**************************************************************************************************/
+		// tag: thread
+		class thread : public tag
+		{
+		public:
+			thread()
+				: mThreadId(std::this_thread::get_id())
+			{
+			}
+
+			thread(std::thread::id _id)
+				: mThreadId(_id)
+			{
+			}
+
+			virtual std::wstring name() const override
+			{
+				return L"thread";
+			}
+
+			virtual std::wstring value() const override
+			{
+				std::wostringstream stream;
+				stream << mThreadId;
+				return stream.str();
+			}
+		private:
+			const std::thread::id mThreadId;
+		};
+
+
 	}
 }
 
