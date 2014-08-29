@@ -2,11 +2,12 @@
 #ifndef _LOGX_STDTAGS_HPP
 #define _LOGX_STDTAGS_HPP
 
+#include <chrono>
 #include "tag.hpp"
 
 
 #ifndef __FUNCTION__
-#	define __FUNCTION__ ""
+#	define __FUNCTION__ "<unknown>"
 #endif
 
 namespace logx {
@@ -101,6 +102,40 @@ namespace logx {
 		static log_level warning(details::_log_level::WARNING);
 		static log_level error(details::_log_level::ERROR);
 		static log_level fatal(details::_log_level::FATAL);
+
+		/**************************************************************************************************/
+		// tag: time
+		class time : public tag
+		{
+		public:
+			typedef std::chrono::system_clock clock_type;
+			typedef clock_type::time_point time_point;
+
+		public:
+			time()
+				: mTime(std::chrono::system_clock::now())
+			{
+			}
+
+			time(time_point _time)
+				: mTime(_time)
+			{
+			}
+
+			virtual std::wstring name() const override
+			{
+				return L"time";
+			}
+
+			virtual std::wstring value() const override
+			{
+				return std::to_wstring(mTime.time_since_epoch().count());
+			}
+
+		private:
+			const time_point mTime;
+		};
+
 	}
 }
 
