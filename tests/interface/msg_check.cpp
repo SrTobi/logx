@@ -21,7 +21,7 @@ struct SinkInitFixture
 #ifndef LOGXCFG_USE_WCHAR
 	void check(const std::string& _line)
 	{
-		BOOST_REQUIRE(_line == mSink->pop_front());
+		BOOST_REQUIRE_EQUAL(_line, mSink->pop_front());
 	}
 #else
 
@@ -38,7 +38,7 @@ struct SinkInitFixture
 		check(LOGXTXT("test-1"));
 
 		logx::log("linebreak in 3 2 1\nok");
-		check(LOGXTXT("linebraeak in 3 2 1\nok"));
+		check(LOGXTXT("linebreak in 3 2 1\nok"));
 	}
 
 	void check_direct_arg_loggin()
