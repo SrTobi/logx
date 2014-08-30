@@ -43,12 +43,12 @@ namespace logx {
 #	define LOGXTXT(_text) _text
 #endif
 
-#define LOGX_LITERAL(T,x) CString_traits<T>::choose(x, L##x)
+#define LOGX_LITERAL(T,x) ::logx::details::string_traits<T>::choose(x, L##x)
 
 	namespace details {
 
 		template<typename T>
-		struct CString_traits
+		struct string_traits
 		{
 			typedef char char_type;
 			static const char * choose(const char * narrow, const wchar_t * wide) { return narrow; }
@@ -56,7 +56,7 @@ namespace logx {
 		};
 
 		template<>
-		struct CString_traits <wchar_t>
+		struct string_traits <wchar_t>
 		{
 			typedef wchar_t char_type;
 			static const wchar_t * choose(const char * narrow, const wchar_t * wide) { return wide; }
