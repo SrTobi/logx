@@ -26,7 +26,7 @@ namespace logx {
 		template<typename Ch, typename Ty>
 		std::basic_ostream<Ch>& operator <<(std::basic_ostream<Ch>& _stream, const std::chrono::duration<Ty, std::micro>& _dur)
 		{
-			_stream << _dur.count() << LOGX_LITERAL(Ch, "mics");
+			_stream << _dur.count() << LOGX_LITERAL(Ch, "micro");
 
 			return _stream;
 		}
@@ -63,18 +63,48 @@ namespace logx {
 			return _stream;
 		}
 
-		template<typename Ch, typename Ty, typename Period, typename std::enable_if<std::is_integral<Ty>::value>::type* = nullptr>
+		template<typename Ch, typename Ty, typename Period>
 		std::basic_ostream<Ch>& operator <<(std::basic_ostream<Ch>& _stream, const std::chrono::duration<Ty, Period>& _dur)
 		{
-			_stream << std::chrono::duration_cast<std::chrono::milliseconds>(_dur);
+			typedef std::ratio<60> minute_ratio;
+			typedef std::ratio<60 * 60> hour_ratio;
+			const auto num = Period::num;
+			const auto den= Period::den;
 
-			return _stream;
-		}
+			if (num >= den)
+			{
+				const auto div = num / den;
 
-		template<typename Ch, typename Ty, typename Period, typename std::enable_if<std::is_floating_point<Ty>::value>::type* = nullptr>
-		std::basic_ostream<Ch>& operator <<(std::basic_ostream<Ch>& _stream, const std::chrono::duration<Ty, Period>& _dur)
-		{
-			_stream << std::chrono::duration_cast<std::chrono::duration<Ty, std::ratio<1>>(_dur);
+				if (div >= hour_ratio::num)
+				{
+					_stream << std::chrono::duration_cast<std::chrono::duration<Ty, hour_ratio>>(_dur);
+				}
+				else if (div >= minute_ratio::num)
+				{
+					_stream << std::chrono::duration_cast<std::chrono::duration<Ty, minute_ratio>>(_dur);
+				}
+				else
+				{
+					_stream << std::chrono::duration_cast<std::chrono::duration<Ty, std::ratio<1>>>(_dur);
+				}
+			}
+			else
+			{
+				const auto div = den / num;
+
+				if (div >= std::nano::den)
+	 			{
+					_stream << std::chrono::duration_cast<std::chrono::duration<Ty, std::nano>>(_dur);
+				}
+				else if (div >= std::micro::den)
+				{
+					_stream << std::chrono::duration_cast<std::chrono::duration<Ty, std::micro>>(_dur);
+				}
+				else
+				{
+					_stream << std::chrono::duration_cast<std::chrono::duration<Ty, std::milli>>(_dur);
+				}
+			}
 
 			return _stream;
 		}
