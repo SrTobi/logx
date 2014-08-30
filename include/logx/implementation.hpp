@@ -33,7 +33,7 @@ namespace logx {
 				mDescription = format(mMessage->msg(), mArgsAsString);
 			}
 
-			virtual const std::wstring& msg() const override
+			virtual const string& msg() const override
 			{
 				return mDescription;
 			}
@@ -41,9 +41,9 @@ namespace logx {
 
 		private:
 			message_base* mMessage;
-			std::wstring mDescription;
+			string mDescription;
 			std::vector<const message_arg*> mArgs;
-			std::vector<const std::wstring> mArgsAsString;
+			std::vector<const string> mArgsAsString;
 		};
 
 		template<typename Dummy = void>
@@ -93,7 +93,12 @@ namespace logx {
 
 			static void _default_sink(const logx::sink_message& msg)
 			{
-				std::wcout << msg.msg() << std::endl;
+#ifdef LOGXCFG_USE_WCHAR
+				std::wcout
+#else
+				std::cout
+#endif
+					<< msg.msg() << std::endl;
 			}
 
 

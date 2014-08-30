@@ -12,29 +12,57 @@ namespace logx {
 
 	namespace details{
 
-		static std::wstring to_wstring(std::wstring _str)
+#ifdef LOGXCFG_USE_WCHAR
+		static string to_string(std::wstring _str)
 		{
 			return _str;
 		}
 
-		static std::wstring to_wstring(const std::string& _str)
+		static string to_string(const std::string& _str)
 		{
 			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 			return converter.from_bytes(_str.c_str());
 		}
 
+		template<typename T>
+		string std_to_string(const T& _var)
+		{
+			return std::to_wstring(_var);
+		}
+
+#else
+
+		static string to_string(std::string _str)
+		{
+			return _str;
+		}
+
+		static string to_string(const std::wstring& _str)
+		{
+			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+			return converter.to_bytes(_str.c_str());
+		}
+
+		template<typename T>
+		string std_to_string(const T& _var)
+		{
+			return std::to_string(_var);
+		}
+
+#endif
 
 		namespace streaming_fallback
 		{
 			struct anything { template<typename X> anything(const X&){} };
-			static std::wostream& operator <<(std::wostream& stream, const anything&)
+
+			template<typename Ch>
+			std::basic_ostream<Ch>& operator <<(std::basic_ostream<Ch>& stream, const anything&)
 			{
-				stream << L"[unknown]";
+				stream << LOGX_LITERAL(Ch, "[unknown]");
 				return stream;
 			}
 
 		}
-
 
 	}
 

@@ -7,6 +7,7 @@
 // #define LOGXCFG_FORCE_DEBUG_LOG
 // #define LOGXCFG_FORCE_RELEASE_LOG
 // #define LOGXCFG_SYNC
+// #define LOGXCFG_USE_WCHAR
 
 
 #if !defined(NDEBUG) || defined(LOGXCFG_FORCE_DEBUG_BUILD)
@@ -26,15 +27,45 @@
 
 #endif
 
+
 #define _LOGXW(_text) L##_text
 #define LOGXW(_text) _LOGXW(_text)
 
-#ifdef LOGXCFG_FORCE_WCHAR
-#	define LOGXTXT(_text) LOGW(_text)
+namespace logx {
+
+#ifdef LOGXCFG_USE_WCHAR
+	typedef wchar_t char_type;
+	typedef std::wstring string;
+#	define LOGXTXT(_text) _LOGXW(_text)
 #else
+	typedef char char_type;
+	typedef std::string string;
 #	define LOGXTXT(_text) _text
 #endif
 
+#define LOGX_LITERAL(T,x) CString_traits<T>::choose(x, L##x)
+
+	namespace details {
+
+		template<typename T>
+		struct CString_traits
+		{
+			typedef char char_type;
+			static const char * choose(const char * narrow, const wchar_t * wide) { return narrow; }
+			static char choose(char narrow, wchar_t wide) { return narrow; }
+		};
+
+		template<>
+		struct CString_traits <wchar_t>
+		{
+			typedef wchar_t char_type;
+			static const wchar_t * choose(const char * narrow, const wchar_t * wide) { return wide; }
+			static wchar_t choose(char narrow, wchar_t wide) { return wide; }
+		};
+
+	}
+
+}
 
 
 #endif

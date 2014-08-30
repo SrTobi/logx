@@ -8,9 +8,9 @@
 namespace logx {
 	namespace details {
 
-		static std::wstring format(const std::wstring& _str, const std::vector<const std::wstring>& _args)
+		static string format(const string& _str, const std::vector<const string>& _args)
 		{
-			std::wstring _result;
+			string _result;
 
 			for (auto it = _str.begin(); it != _str.end();)
 			{

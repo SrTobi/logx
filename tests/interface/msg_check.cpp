@@ -18,34 +18,42 @@ struct SinkInitFixture
 		core.add_sink(func);
 	}
 
+#ifndef LOGXCFG_USE_WCHAR
+	void check(const std::string& _line)
+	{
+		BOOST_REQUIRE(_line == mSink->pop_front());
+	}
+#else
+
 	void check(const std::wstring& _line)
 	{
 		BOOST_REQUIRE(_line == mSink->pop_front());
 	}
+#endif
 
 
 	void check_simple_logging()
 	{
 		logx::log("test-1");
-		check(L"test-1");
+		check(LOGXTXT("test-1"));
 
-		logx::log("linebraeak in 3 2 1\nok");
-		check(L"linebraeak in 3 2 1\nok");
+		logx::log("linebreak in 3 2 1\nok");
+		check(LOGXTXT("linebraeak in 3 2 1\nok"));
 	}
 
 	void check_direct_arg_loggin()
 	{
 		logx::log("test $1", "test");
-		check(L"test test");
+		check(LOGXTXT("test test"));
 
 		logx::log("$1$2$3", 1, 2, 3);
-		check(L"123");
+		check(LOGXTXT("123"));
 
 		logx::log("$1 $2 $3", 1, 2, 3);
-		check(L"1 2 3");
+		check(LOGXTXT("1 2 3"));
 
 		logx::log("$1 $2 $3", 1, "test", 3.5);
-		check(L"1 test 3.5");
+		check(LOGXTXT("1 test 3.5"));
 	}
 };
 

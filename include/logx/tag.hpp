@@ -6,6 +6,7 @@
 
 #include <string>
 #include <ostream>
+#include "config.hpp"
 
 namespace logx {
 
@@ -15,8 +16,8 @@ namespace logx {
 	{
 	public:
 		virtual ~tag() {}
-		virtual std::wstring name() const = 0;
-		virtual std::wstring value() const = 0;
+		virtual string name() const = 0;
+		virtual string value() const = 0;
 	};
 
 
@@ -30,13 +31,13 @@ namespace logx {
 			: mArgs(std::move(_args)...)
 		{}
 
-		virtual std::wstring value() const override
+		virtual string value() const override
 		{
 			return _build_value(mArgs);
 		}
 
 	protected:
-		virtual std::wstring _build_value(const tuple_type& _args) const = 0;
+		virtual string _build_value(const tuple_type& _args) const = 0;
 
 	private:
 		const tuple_type mArgs;
@@ -54,8 +55,8 @@ namespace logx {
 	struct _name : public logx::parameterized_tag_base<__VA_ARGS__>						\
 	{																												\
 		template<typename... Args> _name(Args&&... _args) : logx::parameterized_tag_base<__VA_ARGS__>(std::forward<Args>(_args)...){}	\
-		inline virtual std::wstring name() const override { return LOGXW(#_name); }										\
-		inline virtual std::wstring _build_value(const tuple_type& _args) const override									\
+		inline virtual string name() const override { return LOGXTXT(#_name); }										\
+		inline virtual string _build_value(const tuple_type& _args) const override									\
 		{ return _val_build; }																		\
 	};
 }

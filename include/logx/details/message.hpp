@@ -25,7 +25,7 @@ namespace logx {
 		friend class details::specific_message_arg;
 	public:
 		virtual const std::type_info& type() const = 0;
-		virtual std::wstring to_string() const = 0;
+		virtual string to_string() const = 0;
 		template<typename _Ty>
 		_Ty* as()
 		{
@@ -49,7 +49,7 @@ namespace logx {
 		class message_base
 		{
 		public:
-			virtual std::wstring msg() const = 0;
+			virtual string msg() const = 0;
 			virtual int arg_count() const = 0;
 			virtual std::vector<const message_arg*> args() const = 0;
 		};
@@ -67,10 +67,10 @@ namespace logx {
 				return typeid(_Ty);
 			}
 
-			virtual std::wstring to_string() const override
+			virtual string to_string() const override
 			{
 				using namespace streaming_fallback;
-				std::wostringstream ss;
+				std::basic_ostringstream<char_type> ss;
 				ss << std::boolalpha << mValue;
 				return ss.str();
 			}
@@ -100,9 +100,9 @@ namespace logx {
 			{
 			}
 
-			virtual std::wstring msg() const override
+			virtual string msg() const override
 			{
-				return to_wstring(mMessage);
+				return to_string(mMessage);
 			}
 
 			int arg_count() const override

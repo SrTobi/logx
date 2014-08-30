@@ -10,7 +10,7 @@ namespace logx {
 	class sink_message
 	{
 	public:
-		virtual const std::wstring& msg() const = 0;
+		virtual const string& msg() const = 0;
 
 	private:
 	};

@@ -6,12 +6,14 @@
 #include <logx.hpp>
 #include <logx/sink.hpp>
 #include <list>
+#include "logx/config.hpp"
+
 
 namespace test_sinks {
 
 	class msg_to_string_list_sink
 	{
-		typedef std::function<std::wstring(const logx::sink_message&)> str_func;
+		typedef std::function<logx::string(const logx::sink_message&)> str_func;
 	public:
 		msg_to_string_list_sink(str_func _sink = &msg_to_string_list_sink::_default_func)
 			: mSinkFunc(_sink)
@@ -23,7 +25,7 @@ namespace test_sinks {
 			mMsgList.push_back(mSinkFunc(msg));
 		}
 
-		std::wstring pop_front()
+		logx::string pop_front()
 		{
 			auto r = mMsgList.front();
 			mMsgList.pop_front();
@@ -31,14 +33,14 @@ namespace test_sinks {
 		}
 
 	private:
-		static std::wstring _default_func(const logx::sink_message& msg)
+		static logx::string _default_func(const logx::sink_message& msg)
 		{
 			return msg.msg();
 		}
 
 	private:
 		str_func mSinkFunc;
-		std::list<std::wstring> mMsgList;
+		std::list<logx::string> mMsgList;
 	};
 
 
