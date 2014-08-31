@@ -5,7 +5,12 @@
 
 #include <string>
 #include <type_traits>
-#include <codecvt>
+#include "../config.hpp"
+
+#if _LOGX_FEATURE_STD_CODECVT != _LOGX_FEATURE_HAS_NOT
+#	include <codecvt>
+#	define _LOGX_STD_CODECVT
+#endif
 
 
 namespace logx {
@@ -20,8 +25,12 @@ namespace logx {
 
 		static string to_string(const std::string& _str)
 		{
+#ifdef _LOGX_STD_CODECVT
 			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 			return converter.from_bytes(_str.c_str());
+#else
+			return std::wstring(_str.begin(), _str.end());
+#endif
 		}
 
 		template<typename T>
@@ -39,8 +48,17 @@ namespace logx {
 
 		static string to_string(const std::wstring& _str)
 		{
+#ifdef _LOGX_STD_CODECVT
 			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 			return converter.to_bytes(_str.c_str());
+#else
+			string result;
+
+			for(auto c : _str)
+				result += (c >= 128)? '?' : c;
+
+			return result;
+#endif
 		}
 
 		template<typename T>

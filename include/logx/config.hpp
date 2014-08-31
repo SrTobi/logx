@@ -27,6 +27,26 @@
 
 #endif
 
+#define _LOGX_FEATURE_HAS_NOT		0
+#define _LOGX_FEATURE_HAS			1
+#define _LOGX_FEATURE_HAS_MAYBE		2
+
+#ifdef __GNUC__
+#	define _LOGX_FEATURE_STD_CODECVT _LOGX_FEATURE_HAS_NOT
+#else
+#	ifdef _MSC_VER
+#		define _LOGX_FEATURE_STD_CODECVT _LOGX_FEATURE_HAS
+#	else
+#		define _LOGX_FEATURE_STD_CODECVT _LOGX_FEATURE_HAS_MAYBE
+#	endif
+#endif
+
+
+
+
+
+
+
 
 #define _LOGXW(_text) L##_text
 #define LOGXW(_text) _LOGXW(_text)
