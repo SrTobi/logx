@@ -25,7 +25,7 @@ namespace logx {
 		class log_core;
 
 		template<>
-		class log_core<void> : private std::enable_shared_from_this<log_core<void>>
+		class log_core<void> : public std::enable_shared_from_this<log_core<void>>
 		{
 			template<typename _Dummy>
 			friend class log_thread;

@@ -8,21 +8,21 @@
 namespace logx {
 	namespace details {
 
-		static string format(const string& _str, const std::vector<const string>& _args)
+		static string format(const string& _str, const std::vector<string>& _args)
 		{
 			string _result;
 
 			for (auto it = _str.begin(); it != _str.end();)
 			{
-				if (*it == L'$' && std::next(it) != _str.end())
+				if (*it == LOGXTXT('$') && std::next(it) != _str.end())
 				{
 					int arg = -1;
 					++it;
-					if (*it != L'$')
+					if (*it != LOGXTXT('$'))
 					{
-						while (it != _str.end() && *it >= L'0' && *it <= L'9')
+						while (it != _str.end() && *it >= LOGXTXT('0') && *it <= LOGXTXT('9'))
 						{
-							arg += *it - L'0';
+							arg += *it - LOGXTXT('0');
 							++it;
 						}
 
@@ -35,7 +35,7 @@ namespace logx {
 							return _result;
 					}
 					else{
-						_result.push_back(L'$');
+						_result.push_back(LOGXTXT('$'));
 						++it;
 					}
 				}

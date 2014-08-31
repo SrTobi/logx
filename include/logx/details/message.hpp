@@ -29,13 +29,13 @@ namespace logx {
 		template<typename _Ty>
 		_Ty* as()
 		{
-			return dynamic_cast<specific_message_arg<_Ty>*>(this)->ptr();
+			return dynamic_cast<details::specific_message_arg<_Ty>*>(this)->ptr();
 		}
 
 		template<typename _Ty>
 		const _Ty* as() const
 		{
-			return dynamic_cast<const specific_message_arg<_Ty>*>(this)->ptr();
+			return dynamic_cast<const details::specific_message_arg<_Ty>*>(this)->ptr();
 		}
 
 	private:

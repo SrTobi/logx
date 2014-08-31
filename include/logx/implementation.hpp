@@ -43,7 +43,7 @@ namespace logx {
 			message_base* mMessage;
 			string mDescription;
 			std::vector<const message_arg*> mArgs;
-			std::vector<const string> mArgsAsString;
+			std::vector<string> mArgsAsString;
 		};
 
 		template<typename Dummy = void>
@@ -134,7 +134,7 @@ namespace logx {
 
 				virtual ~_sync_creator() override
 				{
-					delete msg_mem;
+					::operator delete(msg_mem);
 				}
 
 				virtual void done(message_base* msg) override
@@ -185,7 +185,7 @@ namespace logx {
 		};
 	}
 
-	std::shared_ptr<core> core::GLogCore(new details::log_core_impl<>());
+	std::shared_ptr<core> core::GLogCore = std::make_shared<details::log_core_impl<>>();
 
 	core& core::get_core()
 	{
