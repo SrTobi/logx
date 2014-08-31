@@ -1,2 +1,8 @@
 build/
 bin/
+
+# tempfiles
+*.swp
+*.swap
+*.tmp
+*.temp
