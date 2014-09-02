@@ -17,6 +17,36 @@ namespace logx {
 
 	namespace details{
 
+
+		static std::string convert_string(const std::wstring& _str)
+		{
+
+#ifdef _LOGX_STD_CODECVT
+			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+			return converter.to_bytes(_str.c_str());
+#else
+			string result;
+
+			for(auto c : _str)
+				result += (c >= 128)? '?' : c;
+
+			return result;
+#endif
+		}
+
+
+		static std::wstring convert_wstring(const std::string& _str)
+		{
+#ifdef _LOGX_STD_CODECVT
+			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+			return converter.from_bytes(_str.c_str());
+#else
+			return std::wstring(_str.begin(), _str.end());
+#endif
+		}
+
+
+
 #ifdef LOGXCFG_USE_WCHAR
 		static string to_string(std::wstring _str)
 		{
@@ -25,12 +55,7 @@ namespace logx {
 
 		static string to_string(const std::string& _str)
 		{
-#ifdef _LOGX_STD_CODECVT
-			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-			return converter.from_bytes(_str.c_str());
-#else
-			return std::wstring(_str.begin(), _str.end());
-#endif
+			return convert_wstring(_str);
 		}
 
 		template<typename T>
@@ -48,17 +73,7 @@ namespace logx {
 
 		static string to_string(const std::wstring& _str)
 		{
-#ifdef _LOGX_STD_CODECVT
-			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-			return converter.to_bytes(_str.c_str());
-#else
-			string result;
-
-			for(auto c : _str)
-				result += (c >= 128)? '?' : c;
-
-			return result;
-#endif
+			return convert_string(_str);
 		}
 
 		template<typename T>
@@ -74,7 +89,7 @@ namespace logx {
 			struct anything { template<typename X> anything(const X&){} };
 
 			template<typename Ch>
-			std::basic_ostream<Ch>& operator <<(std::basic_ostream<Ch>& stream, const anything&)
+			std::basic_ostream<Ch>& operator <<(std::basic_ostream<Ch>& stream, anything)
 			{
 				stream << LOGX_LITERAL(Ch, "[unknown]");
 				return stream;

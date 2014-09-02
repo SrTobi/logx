@@ -108,6 +108,33 @@ namespace logx {
 
 			return _stream;
 		}
+
+
+		/****************************************************************************************************************************/
+		// string streams
+		static std::wostream& operator << (std::wostream& _stream, const std::string& str)
+		{
+			_stream << details::convert_wstring(str);
+			return _stream;
+		}
+
+		static std::ostream& operator << (std::ostream& _stream, const std::wstring& str)
+		{
+			_stream << details::convert_string(str);
+			return _stream;
+		}
+
+		static std::wostream& operator << (std::wostream& _stream, const char* str)
+		{
+			_stream << details::convert_wstring(str);
+			return _stream;
+		}
+
+		static std::ostream& operator << (std::ostream& _stream, const wchar_t* str)
+		{
+			_stream << details::convert_string(str);
+			return _stream;
+		}
 	}
 }
 
