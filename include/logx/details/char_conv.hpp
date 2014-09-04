@@ -25,7 +25,7 @@ namespace logx {
 			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 			return converter.to_bytes(_str.c_str());
 #else
-			string result;
+			std::string result;
 
 			for(auto c : _str)
 				result += (c >= 128)? '?' : c;
