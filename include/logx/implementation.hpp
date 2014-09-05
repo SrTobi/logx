@@ -9,6 +9,7 @@
 #include <array>
 #include "core.hpp"
 #include "sink.hpp"
+#include "tag.hpp"
 #include "details/formatter.hpp"
 #include "details/memory.hpp"
 
@@ -28,6 +29,10 @@ namespace logx {
 				for (auto arg : mArgs)
 				{
 					mArgsAsString.emplace_back(arg->to_string());
+					
+					auto* asTag = arg->as_tag();
+					if (asTag)
+						mTags.emplace_back(asTag);
 				}
 
 				mDescription = format(mMessage->msg(), mArgsAsString);
@@ -38,12 +43,22 @@ namespace logx {
 				return mDescription;
 			}
 
+			virtual const std::vector<string>& args() const override
+			{
+				return mArgsAsString;
+			}
+
+			virtual const std::vector<const tag*>& tags() const override
+			{
+				return mTags;
+			}
 
 		private:
 			message_base* mMessage;
 			string mDescription;
 			std::vector<const message_arg*> mArgs;
 			std::vector<string> mArgsAsString;
+			std::vector<const tag*> mTags;
 		};
 
 		template<typename Dummy = void>

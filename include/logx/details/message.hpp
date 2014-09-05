@@ -9,6 +9,7 @@
 #include <typeinfo>
 #include <type_traits>
 #include <vector>
+#include "../tag.hpp"
 #include "char_conv.hpp"
 
 namespace logx {
@@ -38,6 +39,8 @@ namespace logx {
 			return dynamic_cast<const details::specific_message_arg<_Ty>*>(this)->ptr();
 		}
 
+		virtual const tag* as_tag() const = 0;
+
 	private:
 		message_arg()
 		{}
@@ -45,6 +48,20 @@ namespace logx {
 	
 	
 	namespace details {
+
+		template<typename Target, typename Source,
+			typename std::enable_if<std::is_base_of<Target, Source>::value>::type* = nullptr>
+		Target* cast_up(Source* _src)
+		{
+			return _src;
+		}
+
+		template<typename Target, typename Source,
+			typename std::enable_if<!std::is_base_of<Target, Source>::value>::type* = nullptr>
+		Target* cast_up(Source* _src)
+		{
+			return nullptr;
+		}
 
 		class message_base
 		{
@@ -83,6 +100,11 @@ namespace logx {
 			auto ptr() const -> typename std::remove_reference < _Ty >::type*
 			{
 				return &mValue;
+			}
+
+			virtual const tag* as_tag() const override
+			{
+				return cast_up<const tag>(&mValue);
 			}
 
 		private:

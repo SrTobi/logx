@@ -7,11 +7,14 @@
 
 namespace logx {
 
+	class tag;
+
 	class sink_message
 	{
 	public:
 		virtual const string& msg() const = 0;
-
+		virtual const std::vector<string>& args() const = 0;
+		virtual const std::vector<const tag*>& tags() const = 0;
 	private:
 	};
 
