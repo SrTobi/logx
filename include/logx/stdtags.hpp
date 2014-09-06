@@ -66,7 +66,7 @@ namespace logx {
 				DETAIL,
 				INFO,
 				WARNING,
-				ERROR,
+				ERR,
 				FATAL,
 				_LOGLVL_COUNT
 			};
@@ -101,7 +101,7 @@ namespace logx {
 		static log_level info(details::_log_level::INFO);
 		static log_level detail(details::_log_level::INFO);
 		static log_level warning(details::_log_level::WARNING);
-		static log_level error(details::_log_level::ERROR);
+		static log_level error(details::_log_level::ERR);
 		static log_level fatal(details::_log_level::FATAL);
 		
 
