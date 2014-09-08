@@ -90,6 +90,11 @@ namespace logx {
 				mSinks.push_back(_sink);
 			}
 
+			virtual void add_wrapped_sink(wrapped_sink_ptr _sink) override
+			{
+				add_sink(_sink->wrap());
+			}
+
 		protected:
 			void _start()
 			{

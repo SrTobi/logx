@@ -15,6 +15,15 @@ namespace logx {
 	class sink_message;
 	typedef std::function<void(const sink_message&)> sink;
 
+	class wrapped_sink : public std::enable_shared_from_this<wrapped_sink>
+	{
+	public:
+		virtual ~wrapped_sink() {}
+		virtual sink wrap() = 0;
+	};
+
+	typedef std::shared_ptr<wrapped_sink> wrapped_sink_ptr;
+
 	namespace details {
 
 
@@ -34,6 +43,7 @@ namespace logx {
 
 			virtual void init() = 0;
 			virtual void add_sink(sink _sink) = 0;
+			virtual void add_wrapped_sink(wrapped_sink_ptr _sink) = 0;
 
 			static log_core& get_core();
 			static void set_core(log_core& other);
@@ -61,6 +71,7 @@ namespace logx {
 			static std::shared_ptr<log_core> GLogCore;
 		};
 	}
+
 	typedef details::log_core<> core;
 }
 
