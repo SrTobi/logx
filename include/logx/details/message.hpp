@@ -11,6 +11,7 @@
 #include <vector>
 #include "../tag.hpp"
 #include "char_conv.hpp"
+#include "additional_streams.hpp"
 
 namespace logx {
 	struct sink_base;
@@ -87,7 +88,7 @@ namespace logx {
 
 			virtual string to_string() const override
 			{
-				using namespace streaming_fallback;
+				using namespace additional_streams;
 				std::basic_ostringstream<char_type> ss;
 				ss << std::boolalpha << mValue;
 				return ss.str();
