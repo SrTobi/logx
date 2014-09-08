@@ -10,6 +10,7 @@
 #include "core.hpp"
 #include "sink.hpp"
 #include "tag.hpp"
+#include "stream_sink.hpp"
 #include "details/formatter.hpp"
 #include "details/memory.hpp"
 
@@ -68,7 +69,12 @@ namespace logx {
 			log_core_impl()
 				: mRunning(true)
 			{
-				mSinks.push_back(&log_core_impl::_default_sink);
+#ifdef LOGXCFG_USE_WCHAR
+				auto sink = std::make_shared<stream_sink>(std::wcout);
+#else
+				auto sink = std::make_shared<stream_sink>(std::cout);
+#endif
+				mSinks.push_back(sink->wrap());
 				_start();
 			}
 
@@ -109,16 +115,6 @@ namespace logx {
 				mRunning = false;
 				mWorkerThread.join();
 #endif
-			}
-
-			static void _default_sink(const logx::sink_message& msg)
-			{
-#ifdef LOGXCFG_USE_WCHAR
-				std::wcout
-#else
-				std::cout
-#endif
-					<< msg.msg() << std::endl;
 			}
 
 
