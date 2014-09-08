@@ -66,6 +66,7 @@ namespace logx {
 		class message_base
 		{
 		public:
+			virtual ~message_base() {};
 			virtual string msg() const = 0;
 			virtual int arg_count() const = 0;
 			virtual std::vector<const message_arg*> args() const = 0;
