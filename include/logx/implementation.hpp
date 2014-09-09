@@ -71,6 +71,12 @@ namespace logx {
 				return mTagList;
 			}
 
+			virtual const tag* _get_tag(const std::type_info& _ty) const override
+			{
+				auto it = mTags.find(_ty);
+				return it == mTags.end() ? nullptr : it->second;
+			}
+
 		private:
 			message_base* mMessage;
 			string mDescription;
