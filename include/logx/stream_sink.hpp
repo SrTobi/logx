@@ -41,25 +41,8 @@ namespace logx {
 			{
 				if (show_category || show_loglevel)
 				{
-					const tags::cat* cat_tag = nullptr;
-					const tags::log_level* ll_tag = nullptr;
-
-					for (auto cur_tag : msg.tags())
-					{
-						if (show_category)
-						{
-							auto c_tag = dynamic_cast<const tags::cat*>(cur_tag);
-							if (c_tag)
-								cat_tag = c_tag;
-						}
-
-						if (show_loglevel)
-						{
-							auto l_tag = dynamic_cast<const tags::log_level*>(cur_tag);
-							if (l_tag)
-								ll_tag = l_tag;
-						}
-					}
+					const tags::cat* cat_tag = msg.get_tag<tags::cat>();
+					const tags::log_level* ll_tag = msg.get_tag<tags::log_level>();
 
 					if (cat_tag)
 						mStream << char_type('[') << cat_tag->value() << char_type(']');
