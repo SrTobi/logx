@@ -7,6 +7,8 @@
 #include <iostream>
 #include <thread>
 #include <array>
+#include <unordered_map>
+#include <typeindex>
 #include "core.hpp"
 #include "sink.hpp"
 #include "tag.hpp"
@@ -21,7 +23,7 @@ namespace logx {
 		class sink_message_impl : public sink_message
 		{
 		public:
-			sink_message_impl(message_base* message)
+			sink_message_impl(message_base* message, const std::unordered_map<std::type_index, std::shared_ptr<tag>>& _default_tags)
 				: mMessage(message)
 			{
 				mArgs = mMessage->args();
@@ -33,7 +35,15 @@ namespace logx {
 					
 					auto* asTag = arg->as_tag();
 					if (asTag)
-						mTags.emplace_back(asTag);
+						mTags.emplace(typeid(*asTag), asTag);
+				}
+
+				for (auto& e : _default_tags)
+				{
+					if (!mTags.count(e.first))
+					{
+						mTags.emplace(e.first, e.second.get());
+					}
 				}
 
 				mDescription = format(mMessage->msg(), mArgsAsString);
@@ -51,7 +61,14 @@ namespace logx {
 
 			virtual const std::vector<const tag*>& tags() const override
 			{
-				return mTags;
+				if (mTagList.size() != mTags.size())
+				{
+					for (auto& e : mTags)
+					{
+						mTagList.push_back(e.second);
+					}
+				}
+				return mTagList;
 			}
 
 		private:
@@ -59,7 +76,8 @@ namespace logx {
 			string mDescription;
 			std::vector<const message_arg*> mArgs;
 			std::vector<string> mArgsAsString;
-			std::vector<const tag*> mTags;
+			mutable std::vector<const tag*> mTagList;
+			std::unordered_map<std::type_index, const tag*> mTags;
 		};
 
 		template<typename Dummy = void>
@@ -101,7 +119,30 @@ namespace logx {
 				add_sink(_sink->wrap());
 			}
 
+			virtual bool remove_default_tag(const std::type_info& _ty) override
+			{
+				std::lock_guard<std::mutex> lock(mSinkMutex);
+				return mDefaultTags.erase(_ty) > 0;
+			}
+
 		protected:
+			virtual std::shared_ptr<tag> _add_default_tag(const std::type_info& _ty, const std::shared_ptr<tag>& _tag) override
+			{
+				std::lock_guard<std::mutex> lock(mSinkMutex);
+				auto it = mDefaultTags.find(_ty);
+
+				if (it == mDefaultTags.end())
+				{
+					mDefaultTags.emplace(_ty, _tag);
+					return nullptr;
+				}
+				else{
+					std::shared_ptr<tag> result = _tag;
+					std::swap(it->second, result);
+					return result;
+				}
+			}
+
 			void _start()
 			{
 #ifndef LOGXCFG_SYNC
@@ -130,7 +171,7 @@ namespace logx {
 
 			void _send_sink(message_base* msg)
 			{
-				sink_message_impl<> sink_msg(msg);
+				sink_message_impl<> sink_msg(msg, mDefaultTags);
 
 				std::lock_guard<std::mutex> lock(mSinkMutex);
 				for (auto& sink : mSinks)
@@ -188,6 +229,7 @@ namespace logx {
 
 		private:
 			std::vector<sink> mSinks;
+			std::unordered_map<std::type_index, std::shared_ptr<tag>> mDefaultTags;
 
 			std::mutex mSinkMutex;
 			std::mutex mMsgMutex;

@@ -3,6 +3,7 @@
 #define _LOGX_CORE_HPP
 
 
+#include <typeinfo>
 #include <type_traits>
 #include <functional>
 #include <memory>
@@ -45,6 +46,17 @@ namespace logx {
 			virtual void add_sink(sink _sink) = 0;
 			virtual void add_wrapped_sink(wrapped_sink_ptr _sink) = 0;
 
+
+			virtual bool remove_default_tag(const std::type_info& _ty) = 0;
+
+			template<typename Tag, typename std::enable_if<std::is_base_of<tag, Tag>::value>::type* = nullptr>
+			std::shared_ptr<tag> add_default_tag(Tag&& _tag)
+			{
+				return _add_default_tag(typeid(Tag), std::make_shared<Tag>(std::forward<Tag>(_tag)));
+			}
+
+
+
 			static log_core& get_core();
 			static void set_core(log_core& other);
 
@@ -65,7 +77,7 @@ namespace logx {
 			};
 
 			virtual _msg_creator* _get_creator(std::size_t _msg_size) = 0;
-
+			virtual std::shared_ptr<tag> _add_default_tag(const std::type_info& _ty, const std::shared_ptr<tag>& _tag) = 0;
 
 		private:
 			static std::shared_ptr<log_core> GLogCore;
