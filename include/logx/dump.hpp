@@ -54,6 +54,12 @@ namespace logx {
 	{
 		return details::container_arg<typename std::iterator_traits<Iter>::value_type, details::sequence_iterator_tag>(_begin, _end);
 	}
+
+	template<typename Iter>
+	details::container_arg<typename std::iterator_traits<Iter>::value_type, details::set_iterator_tag> quantum(Iter _begin, Iter _end)
+	{
+		return details::container_arg<typename std::iterator_traits<Iter>::value_type, details::set_iterator_tag>(_begin, _end);
+	}
 }
 
 namespace std {
@@ -89,8 +95,8 @@ namespace std {
 
 			while (++begin != end)
 			{
+				_stream << Ch(',') << Ch(' ');
 				_stream << begin->first << Ch(' ') << Ch('=') << Ch('>') << Ch(' ') << begin->second;
-				_stream << *begin;
 			}
 		}
 		_stream << Ch(']');
