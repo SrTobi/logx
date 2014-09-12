@@ -11,7 +11,8 @@
 
 
 
-
+namespace _logx_helper_ns = logx;
+#define logxLOG(...) _logx_helper_ns::log(__VA_ARGS__)
 
 
 #endif
