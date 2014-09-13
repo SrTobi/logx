@@ -12,7 +12,7 @@
 #include "core.hpp"
 #include "sink.hpp"
 #include "tag.hpp"
-#include "stream_sink.hpp"
+#include "text_sink.hpp"
 #include "details/formatter.hpp"
 #include "details/memory.hpp"
 
@@ -94,9 +94,9 @@ namespace logx {
 				: mRunning(true)
 			{
 #ifdef LOGXCFG_USE_WCHAR
-				auto sink = std::make_shared<stream_sink>(std::wcout);
+				auto sink = std::make_shared<text_sink>(std::wcout);
 #else
-				auto sink = std::make_shared<stream_sink>(std::cout);
+				auto sink = std::make_shared<text_sink>(std::cout);
 #endif
 				mSinks.push_back(sink->wrap());
 				_start();
