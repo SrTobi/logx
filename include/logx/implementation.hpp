@@ -98,7 +98,7 @@ namespace logx {
 #else
 				auto sink = std::make_shared<text_sink>(std::cout);
 #endif
-				mSinks.push_back(sink->wrap());
+				mSinks.push_back(std::bind(&text_sink::on_message, sink, std::placeholders::_1));
 				_start();
 			}
 
@@ -118,11 +118,6 @@ namespace logx {
 			{
 				std::lock_guard<std::mutex> lock(mSinkMutex);
 				mSinks.push_back(_sink);
-			}
-
-			virtual void add_wrapped_sink(wrapped_sink_ptr _sink) override
-			{
-				add_sink(_sink->wrap());
 			}
 
 			virtual bool remove_default_tag(const std::type_info& _ty) override

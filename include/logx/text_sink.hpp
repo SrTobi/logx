@@ -14,7 +14,7 @@ namespace logx {
 	namespace details {
 
 		template<typename Ch = char_type>
-		class text_sink_impl : public wrapped_sink
+		class text_sink_impl
 		{
 		public:
 			typedef std::basic_ostream<Ch> stream_type;
@@ -29,15 +29,7 @@ namespace logx {
 			virtual ~text_sink_impl()
 			{}
 
-			virtual sink wrap() override
-			{
-				return std::bind(&text_sink_impl::_message, std::static_pointer_cast<text_sink_impl>(this->shared_from_this()), std::placeholders::_1);
-			}
-
-			bool show_category;
-			bool show_loglevel;
-		protected:
-			virtual void _message(const sink_message& msg)
+			virtual void on_message(const sink_message& msg)
 			{
 				if (show_category || show_loglevel)
 				{
@@ -54,10 +46,11 @@ namespace logx {
 				mStream << msg.msg() << std::endl;
 			}
 
+			bool show_category;
+			bool show_loglevel;
 		private:
 			stream_type& mStream;
 		};
-
 	}
 
 	typedef details::text_sink_impl<> text_sink;
