@@ -11,7 +11,7 @@
 #include "logx/details/formatter.hpp"
 #include "logx/details/memory.hpp"
 #include "logx/details/message.hpp"
-#include "logx_api.hpp"
+#include <logx/logx_api.hpp>
 
 namespace logx {
 

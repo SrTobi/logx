@@ -10,7 +10,7 @@
 #include <list>
 #include "config.hpp"
 #include "details/message.hpp"
-#include "logx_api.hpp"
+#include <logx/logx_api.hpp>
 
 
 namespace logx {
