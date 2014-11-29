@@ -1,5 +1,5 @@
-#include "test_settings.hpp"
-#include "test_sinks.hpp"
+#include <testx/testx.hpp>
+#include "../test_sinks.hpp"
 #include <logx.hpp>
 #include <logx/core.hpp>
 
@@ -58,7 +58,7 @@ struct SinkInitFixture
 };
 
 
-LOGX_START_FIXTURE_TEST(SinkInitFixture)
-	LOGX_FIXTURE_TEST(check_simple_logging);
-	LOGX_FIXTURE_TEST(check_direct_arg_loggin);
-LOGX_END_FIXTURE_TEST();
+TESTX_START_FIXTURE_TEST(SinkInitFixture)
+	TESTX_FIXTURE_TEST(check_simple_logging);
+	TESTX_FIXTURE_TEST(check_direct_arg_loggin);
+TESTX_END_FIXTURE_TEST();

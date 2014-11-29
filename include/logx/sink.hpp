@@ -10,7 +10,7 @@ namespace logx {
 
 	class tag;
 
-	class sink_message
+	class LOGX_EXPORT sink_message
 	{
 	public:
 		virtual ~sink_message() {}

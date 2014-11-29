@@ -1,26 +1,22 @@
-#ifdef _LOGX_IMPLEMENTATION_HPP
-#	error "implementation.hpp should one be included once!"
-#endif
-
-
 #include <mutex>
 #include <iostream>
 #include <thread>
 #include <array>
 #include <unordered_map>
 #include <typeindex>
-#include "core.hpp"
-#include "sink.hpp"
-#include "tag.hpp"
-#include "text_sink.hpp"
-#include "details/formatter.hpp"
-#include "details/memory.hpp"
+#include "logx/core.hpp"
+#include "logx/sink.hpp"
+#include "logx/tag.hpp"
+#include "logx/text_sink.hpp"
+#include "logx/details/formatter.hpp"
+#include "logx/details/memory.hpp"
+#include "logx/details/message.hpp"
+#include "logx_api.hpp"
 
 namespace logx {
 
 	namespace details {
-		template<typename Dummy = void>
-		class sink_message_impl : public sink_message
+		class LOGX_EXPORT sink_message_impl : public sink_message
 		{
 		public:
 			sink_message_impl(message_base* message, const std::unordered_map<std::type_index, std::shared_ptr<tag>>& _default_tags)
@@ -86,8 +82,7 @@ namespace logx {
 			std::unordered_map<std::type_index, const tag*> mTags;
 		};
 
-		template<typename Dummy = void>
-		class log_core_impl : public log_core < Dummy >
+		class LOGX_EXPORT log_core_impl : public core
 		{
 		public:
 			log_core_impl()
@@ -160,7 +155,7 @@ namespace logx {
 			}
 
 
-			void _notify_message(log_thread<>& _thread)
+			void _notify_message(log_thread& _thread)
 			{
 				//while (_thread.mMessages.size())
 				//{
@@ -172,7 +167,7 @@ namespace logx {
 
 			void _send_sink(message_base* msg)
 			{
-				sink_message_impl<> sink_msg(msg, mDefaultTags);
+				sink_message_impl sink_msg(msg, mDefaultTags);
 
 				std::lock_guard<std::mutex> lock(mSinkMutex);
 				for (auto& sink : mSinks)
@@ -182,9 +177,9 @@ namespace logx {
 			}
 
 #ifdef LOGXCFG_SYNC
-			struct _sync_creator : public log_core<>::_msg_creator
+			struct _sync_creator : public core::_msg_creator
 			{
-				_sync_creator(std::unique_lock<std::mutex>&& _mutex, log_core_impl<>* _core_impl)
+				_sync_creator(std::unique_lock<std::mutex>&& _mutex, log_core_impl* _core_impl)
 					: mutex(std::move(_mutex))
 					, core_impl(_core_impl)
 				{
@@ -205,7 +200,7 @@ namespace logx {
 				std::unique_lock<std::mutex> mutex;
 			};
 
-			virtual log_core<>::_msg_creator* _get_creator(std::size_t _msg_size) override
+			virtual core::_msg_creator* _get_creator(std::size_t _msg_size) override
 			{
 				std::unique_lock<std::mutex> lock(mMsgMutex);
 				mSyncCreator.construct(std::move(lock), this);
@@ -244,7 +239,7 @@ namespace logx {
 		};
 	}
 
-	std::shared_ptr<core> core::GLogCore = std::make_shared<details::log_core_impl<>>();
+	std::shared_ptr<core> core::GLogCore = std::make_shared<details::log_core_impl>();
 
 	core& core::get_core()
 	{

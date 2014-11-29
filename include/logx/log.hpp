@@ -11,7 +11,7 @@ namespace logx {
 	template<typename _MsgTy, typename... _Args>
 	void log(_MsgTy&& _msg, _Args&&... _args)
 	{
-		details::log_core<>::get_core()
+		core::get_core()
 			.add_log_message(std::forward<_MsgTy>(_msg), std::forward<_Args>(_args)...);
 	}
 

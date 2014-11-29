@@ -1,10 +1,11 @@
 
 ################### scan for source ##################
 
-SCAN_SOURCE_HERE(SOURCE "cpp;hpp")
-AUTO_SOURCE_GROUP("${SOURCE}")
+buildx_scan_here(SIMPLE_SAMPLE_SOURCE "cpp;hpp")
+buildx_debug("'simple sample'-source: ${SIMPLE_SAMPLE_SOURCE}" proj)
+buildx_auto_group("${SIMPLE_SAMPLE_SOURCE}")
+buildx_auto_group("${LOGX_PUBLIC_INCLUDES}")
 
-AUTO_SOURCE_GROUP("${LOGX_INCLUDE_FILES}")
-
-add_executable(logx-simple ${SOURCE} ${LOGX_INCLUDE_FILES})
-target_link_libraries(logx-simple ${Boost_LIBRARIES})
+add_executable(simple-sample ${SIMPLE_SAMPLE_SOURCE} ${LOGX_PUBLIC_INCLUDES})
+target_link_libraries(simple-sample logx)
+buildx_copy_target_dependencies(simple-sample)

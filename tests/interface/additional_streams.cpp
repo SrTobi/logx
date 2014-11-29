@@ -1,4 +1,4 @@
-#include "test_settings.hpp"
+#include <testx/testx.hpp>
 #include "logx/config.hpp"
 #include "logx/additional_streams.hpp"
 
@@ -34,7 +34,7 @@ void check_with_as(T _val, const logx::string& _ref)
 }
 
 
-LOGX_AUTO_TEST_CASE(test_additional_streaming_with_chrono)
+TESTX_AUTO_TEST_CASE(test_additional_streaming_with_chrono)
 {
 	check_with_as(std::chrono::minutes(1), LOGXTXT("1min"));
 	check_with_as(std::chrono::minutes(11), LOGXTXT("11min"));
