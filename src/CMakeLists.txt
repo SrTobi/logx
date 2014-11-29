@@ -1,7 +1,7 @@
 # grab source
 buildx_scan_here(LOGX_SOURCE "cpp;hpp")
 buildx_debug("source: ${LOGX_SOURCE}" proj)
-buildx_auto_group("${LOGX_SOURCE}")
+buildx_auto_group("${LOGX_SOURCE}" PREFIX source)
 buildx_auto_group("${LOGX_PUBLIC_INCLUDES}")
 
 # add library
