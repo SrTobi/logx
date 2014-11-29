@@ -11,15 +11,15 @@ namespace logx {
 
 			for (auto it = _str.begin(); it != _str.end();)
 			{
-				if (*it == LOGXTXT('$') && std::next(it) != _str.end())
+				if (*it == '$' && std::next(it) != _str.end())
 				{
 					int arg = -1;
 					++it;
-					if (*it != LOGXTXT('$'))
+					if (*it != '$')
 					{
-						while (it != _str.end() && *it >= LOGXTXT('0') && *it <= LOGXTXT('9'))
+						while (it != _str.end() && *it >= '0' && *it <= '9')
 						{
-							arg += *it - LOGXTXT('0');
+							arg += *it - '0';
 							++it;
 						}
 
@@ -32,7 +32,7 @@ namespace logx {
 							return _result;
 					}
 					else{
-						_result.push_back(LOGXTXT('$'));
+						_result.push_back('$');
 						++it;
 					}
 				}

@@ -51,13 +51,13 @@ namespace logx {
 		return _stream;
 	}
 
-#define logxTAG(_name, _val_build, ...)																				\
-	struct _name : public logx::parameterized_tag_base<__VA_ARGS__>						\
-	{																												\
+#define logxTAG(_name, _val_build, ...)																									\
+	struct _name : public logx::parameterized_tag_base<__VA_ARGS__>																		\
+	{																																	\
 		template<typename... Args> _name(Args&&... _args) : logx::parameterized_tag_base<__VA_ARGS__>(std::forward<Args>(_args)...){}	\
-		inline virtual string name() const override { return LOGXTXT(#_name); }										\
-		inline virtual string _build_value(const tuple_type& _args) const override									\
-		{ return _val_build; }																		\
+		inline virtual string name() const override { return #_name; }																	\
+		inline virtual string _build_value(const tuple_type& _args) const override														\
+		{ return _val_build; }																											\
 	};
 }
 

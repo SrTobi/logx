@@ -89,7 +89,7 @@ namespace logx {
 			virtual string to_string() const override
 			{
 				using namespace additional_streams;
-				std::basic_ostringstream<char_type> ss;
+				std::ostringstream ss;
 				ss << std::boolalpha << mValue;
 				return ss.str();
 			}

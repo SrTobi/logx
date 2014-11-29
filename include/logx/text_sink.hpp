@@ -13,7 +13,7 @@ namespace logx {
 
 	namespace details {
 
-		template<typename Ch = char_type>
+		template<typename Ch = char>
 		class text_sink_impl
 		{
 		public:
@@ -37,10 +37,10 @@ namespace logx {
 					const tags::log_level* ll_tag = msg.get_tag<tags::log_level>();
 
 					if (cat_tag)
-						mStream << char_type('[') << cat_tag->value() << char_type(']');
+						mStream << '[' << cat_tag->value() << ']';
 
 					if (ll_tag)
-						mStream << ll_tag->value() << char_type(':') << char_type(' ');
+						mStream << ll_tag->value() << ':' << ' ';
 				}
 
 				mStream << msg.msg() << std::endl;

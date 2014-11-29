@@ -15,12 +15,12 @@ namespace logx {
 	namespace tags {
 
 		namespace details {
-			static string trim_file_path(const char_type* _file)
+			static string trim_file_path(const char* _file)
 			{
-				const char_type* it = _file;
+				const char* it = _file;
 				while (*it)
 				{
-					if(*it == char_type('/') || *it == char_type('\\'))
+					if(*it == '/' || *it == '\\')
 						_file = it + 1;
 
 					++it;
@@ -35,16 +35,16 @@ namespace logx {
 		// tag: source
 		logxTAG(source,
 			(
-			details::trim_file_path(std::get<0>(_args)) + LOGXTXT(" in ")
-			+ std::get<1>(_args) +LOGXTXT("(...) at ")
+			details::trim_file_path(std::get<0>(_args)) + " in "
+			+ std::get<1>(_args) + "(...) at "
 			+ logx::details::std_to_string(std::get<2>(_args))
 
 			),
-			const char_type* /* file */,
-			const char_type* /* function */,
+			const char* /* file */,
+			const char* /* function */,
 			unsigned int /* line */
 		)
-#define logxSOURCE ::logx::tags::source(LOGXTXT(__FILE__), LOGXTXT(__FUNCTION__), __LINE__)
+#define logxSOURCE ::logx::tags::source(__FILE__, __FUNCTION__, __LINE__)
 
 
 		/**************************************************************************************************/
@@ -71,15 +71,15 @@ namespace logx {
 				_LOGLVL_COUNT
 			};
 
-			static const char_type* LogLevelNames[int8_t(_log_level::_LOGLVL_COUNT)] =
+			static const char* LogLevelNames[int8_t(_log_level::_LOGLVL_COUNT)] =
 				{
-					LOGXTXT("TRACE"),
-					LOGXTXT("DEBUG"),
-					LOGXTXT("DETAIL"),
-					LOGXTXT("INFO"),
-					LOGXTXT("WARN"),
-					LOGXTXT("ERR"),
-					LOGXTXT("FATAL")
+					"TRACE",
+					"DEBUG",
+					"DETAIL",
+					"INFO",
+					"WARN",
+					"ERR",
+					"FATAL"
 				};
 			
 			template <typename E>
@@ -122,12 +122,12 @@ namespace logx {
 
 			virtual string name() const override
 			{
-				return LOGXTXT("thread");
+				return "thread";
 			}
 
 			virtual string value() const override
 			{
-				std::basic_ostringstream<char_type> stream;
+				std::basic_ostringstream<char> stream;
 				stream << mThreadId;
 				return stream.str();
 			}

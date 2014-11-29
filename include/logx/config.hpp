@@ -56,15 +56,7 @@
 
 namespace logx {
 
-#ifdef LOGXCFG_USE_WCHAR
-	typedef wchar_t char_type;
-	typedef std::wstring string;
-#	define LOGXTXT(_text) _LOGXW(_text)
-#else
-	typedef char char_type;
 	typedef std::string string;
-#	define LOGXTXT(_text) _text
-#endif
 
 #define LOGX_LITERAL(T,x) ::logx::details::string_traits<T>::choose(x, L##x)
 
