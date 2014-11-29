@@ -19,11 +19,11 @@ namespace logx {
 
 	class log_thread;
 
-	class LOGX_EXPORT core : public std::enable_shared_from_this<core>
+	class LOGX_EXPORT core
 	{
 		friend class log_thread;
 	public:
-		virtual ~core() {}
+		virtual ~core();
 
 		virtual void init() = 0;
 		virtual void add_sink(sink _sink) = 0;
@@ -40,7 +40,6 @@ namespace logx {
 
 
 		static core& get_core();
-		static void set_core(core& other);
 
 		template<typename _MsgTy, typename... _Args>
 		void add_log_message(_MsgTy&& _msg, _Args&&... _args)
@@ -60,9 +59,6 @@ namespace logx {
 
 		virtual _msg_creator* _get_creator(std::size_t _msg_size) = 0;
 		virtual std::shared_ptr<tag> _add_default_tag(const std::type_info& _ty, const std::shared_ptr<tag>& _tag) = 0;
-
-	private:
-		static std::shared_ptr<core> GLogCore;
 	};
 }
 

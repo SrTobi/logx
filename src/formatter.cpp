@@ -1,14 +1,11 @@
-#pragma once
-#ifndef _LOGX_FORMATTER_HPP
-#define _LOGX_FORMATTER_HPP
+#include "formatter.hpp"
 
-#include <string>
-#include <vector>
+
 
 namespace logx {
-	namespace details {
+	namespace impl {
 
-		static string format(const string& _str, const std::vector<string>& _args)
+		string format(const string& _str, const std::vector<string>& _args)
 		{
 			string _result;
 
@@ -50,16 +47,7 @@ namespace logx {
 			return _result;
 		}
 
-
-
-
-
-
-
 	}
 }
 
 
-
-
-#endif

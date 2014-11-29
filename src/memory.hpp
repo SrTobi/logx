@@ -3,7 +3,7 @@
 #define _LOGX_MEMORY_HPP
 
 #include <stdexcept>
-#include "../config.hpp"
+#include "logx/config.hpp"
 
 
 namespace logx {

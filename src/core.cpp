@@ -8,84 +8,19 @@
 #include "logx/sink.hpp"
 #include "logx/tag.hpp"
 #include "logx/text_sink.hpp"
-#include "logx/details/formatter.hpp"
-#include "logx/details/memory.hpp"
-#include "logx/details/message.hpp"
 #include <logx/logx_api.hpp>
+
+#include "sink_message.hpp"
+#include "memory.hpp"
 
 namespace logx {
 
-	namespace details {
-		class LOGX_EXPORT sink_message_impl : public sink_message
+	namespace impl {
+
+		class core_impl : public core
 		{
 		public:
-			sink_message_impl(message_base* message, const std::unordered_map<std::type_index, std::shared_ptr<tag>>& _default_tags)
-				: mMessage(message)
-			{
-				mArgs = mMessage->args();
-
-				mArgsAsString.reserve(mArgs.size());
-				for (auto arg : mArgs)
-				{
-					mArgsAsString.emplace_back(arg->to_string());
-					
-					auto* asTag = arg->as_tag();
-					if (asTag)
-						mTags.emplace(typeid(*asTag), asTag);
-				}
-
-				for (auto& e : _default_tags)
-				{
-					if (!mTags.count(e.first))
-					{
-						mTags.emplace(e.first, e.second.get());
-					}
-				}
-
-				mDescription = format(mMessage->msg(), mArgsAsString);
-			}
-
-			virtual const string& msg() const override
-			{
-				return mDescription;
-			}
-
-			virtual const std::vector<string>& args() const override
-			{
-				return mArgsAsString;
-			}
-
-			virtual const std::vector<const tag*>& tags() const override
-			{
-				if (mTagList.size() != mTags.size())
-				{
-					for (auto& e : mTags)
-					{
-						mTagList.push_back(e.second);
-					}
-				}
-				return mTagList;
-			}
-
-			virtual const tag* _get_tag(const std::type_info& _ty) const override
-			{
-				auto it = mTags.find(_ty);
-				return it == mTags.end() ? nullptr : it->second;
-			}
-
-		private:
-			message_base* mMessage;
-			string mDescription;
-			std::vector<const message_arg*> mArgs;
-			std::vector<string> mArgsAsString;
-			mutable std::vector<const tag*> mTagList;
-			std::unordered_map<std::type_index, const tag*> mTags;
-		};
-
-		class LOGX_EXPORT log_core_impl : public core
-		{
-		public:
-			log_core_impl()
+			core_impl()
 				: mRunning(true)
 			{
 #ifdef LOGXCFG_USE_WCHAR
@@ -97,7 +32,7 @@ namespace logx {
 				_start();
 			}
 
-			virtual ~log_core_impl() override
+			virtual ~core_impl() override
 			{
 				_stop();
 			}
@@ -142,7 +77,7 @@ namespace logx {
 			void _start()
 			{
 #ifndef LOGXCFG_SYNC
-				mWorkerThread = std::thread(std::bind(&log_core_impl::_work, this));
+				mWorkerThread = std::thread(std::bind(&core_impl::_work, this));
 #endif
 			}
 
@@ -165,7 +100,7 @@ namespace logx {
 				//}
 			}
 
-			void _send_sink(message_base* msg)
+			void _send_sink(details::message_base* msg)
 			{
 				sink_message_impl sink_msg(msg, mDefaultTags);
 
@@ -179,7 +114,7 @@ namespace logx {
 #ifdef LOGXCFG_SYNC
 			struct _sync_creator : public core::_msg_creator
 			{
-				_sync_creator(std::unique_lock<std::mutex>&& _mutex, log_core_impl* _core_impl)
+				_sync_creator(std::unique_lock<std::mutex>&& _mutex, core_impl* _core_impl)
 					: mutex(std::move(_mutex))
 					, core_impl(_core_impl)
 				{
@@ -190,13 +125,13 @@ namespace logx {
 					::operator delete(msg_mem);
 				}
 
-				virtual void done(message_base* msg) override
+				virtual void done(details::message_base* msg) override
 				{
 					core_impl->_send_sink(msg);
 					core_impl->mSyncCreator.destruct();
 				}
 
-				log_core_impl* core_impl;
+				core_impl* core_impl;
 				std::unique_lock<std::mutex> mutex;
 			};
 
@@ -234,20 +169,22 @@ namespace logx {
 			bool mRunning;
 
 #ifdef LOGXCFG_SYNC
-			uninitialized<_sync_creator> mSyncCreator;
+			details::uninitialized<_sync_creator> mSyncCreator;
 #endif
 		};
 	}
 
-	std::shared_ptr<core> core::GLogCore = std::make_shared<details::log_core_impl>();
+
+
+	// core stuff
+	impl::core_impl GLCore;
+
+	core::~core()
+	{
+	}
 
 	core& core::get_core()
 	{
-		return *GLogCore;
-	}
-
-	void core::set_core(core& _core)
-	{
-		GLogCore = _core.shared_from_this();
+		return GLCore;
 	}
 }
