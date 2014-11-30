@@ -5,6 +5,7 @@ buildx_auto_group("${LOGX_SOURCE}" PREFIX source)
 buildx_auto_group("${LOGX_PUBLIC_INCLUDES}")
 
 # add library
+include_directories(.)
 add_library(logx SHARED ${LOGX_SOURCE} ${LOGX_PUBLIC_INCLUDES})
 buildx_export_header(logx
 					DESTINATION_FILE "LOGX_PUBLIC_INCLUDES"
@@ -24,4 +25,5 @@ buildx_target_includes(	TARGETS logx
 							${LOGX_EXPORT_API_DIR}
 						DESTINATION include/${LOGX_VERSION_DIR})
 
-buildx_add_external_test(interface-test ${PROJECT_SOURCE_DIR}/tests/interface TEST_TARGETS logx)
+buildx_add_external_test(external-test ${PROJECT_SOURCE_DIR}/tests/interface TEST_TARGETS logx)
+buildx_add_internal_test(internal-test ${PROJECT_SOURCE_DIR}/tests/internal TEST_TARGET logx)
