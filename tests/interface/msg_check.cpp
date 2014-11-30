@@ -12,25 +12,16 @@ struct SinkInitFixture
 		
 		mSink = std::make_shared<test_sinks::msg_to_string_list_sink>();
 		
-		core.init();
+		core.remove_all_sinks();
 
 		auto func = std::bind(&test_sinks::msg_to_string_list_sink::on_msg, mSink, std::placeholders::_1);
 		core.add_sink(func);
 	}
 
-#ifndef LOGXCFG_USE_WCHAR
 	void check(const std::string& _line)
 	{
 		BOOST_REQUIRE_EQUAL(_line, mSink->pop_front());
 	}
-#else
-
-	void check(const std::wstring& _line)
-	{
-		BOOST_REQUIRE(_line == mSink->pop_front());
-	}
-#endif
-
 
 	void check_simple_logging()
 	{

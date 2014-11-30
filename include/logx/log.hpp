@@ -12,7 +12,7 @@ namespace logx {
 	void log(_MsgTy&& _msg, _Args&&... _args)
 	{
 		core::get_core()
-			.add_log_message(std::forward<_MsgTy>(_msg), std::forward<_Args>(_args)...);
+			.add_log_message<details::message<_MsgTy, _Args...>>(std::forward<_MsgTy>(_msg), std::forward<_Args>(_args)...);
 	}
 
 }

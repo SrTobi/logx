@@ -9,7 +9,7 @@
 #include <memory>
 #include <list>
 #include "config.hpp"
-#include "details/message.hpp"
+#include "details/base_message.hpp"
 #include <logx/logx_api.hpp>
 
 
@@ -24,40 +24,36 @@ namespace logx {
 		friend class log_thread;
 	public:
 		virtual ~core();
-
-		virtual void init() = 0;
 		virtual void add_sink(sink _sink) = 0;
+		virtual void remove_all_sinks() = 0;
 
-
-		virtual bool remove_default_tag(const std::type_info& _ty) = 0;
-
-		template<typename Tag, typename std::enable_if<std::is_base_of<tag, Tag>::value>::type* = nullptr>
+		template<typename Tag>
 		std::shared_ptr<tag> add_default_tag(Tag&& _tag)
 		{
+			static_assert(std::is_base_of<tag, Tag>::value, "Tag must inherit 'tag'!");
 			return _add_default_tag(typeid(Tag), std::make_shared<Tag>(std::forward<Tag>(_tag)));
 		}
 
+		virtual bool remove_default_tag(const std::type_info& _ty) = 0;
 
-
-		static core& get_core();
 
 		template<typename _MsgTy, typename... _Args>
-		void add_log_message(_MsgTy&& _msg, _Args&&... _args)
+		void add_log_message(_Args&&... _args)
 		{
-			typedef details::message<_MsgTy, _Args...> msg_type;
-			_msg_creator* creator = _get_creator(sizeof(msg_type));
-			msg_type* msg = new (creator->msg_mem) msg_type(std::forward<_MsgTy>(_msg), std::forward<_Args>(_args)...);
-			creator->done(msg);
-		}
-	protected:
-		struct _msg_creator
-		{
-			virtual ~_msg_creator() {}
-			void* msg_mem;
-			virtual void done(details::message_base* msg) = 0;
-		};
+			static_assert(std::is_base_of<details::message_base, _MsgTy>::value, "_MsgTy must inherit message_base!");
+			void* mem = _allocate_message(sizeof(_MsgTy));
 
-		virtual _msg_creator* _get_creator(std::size_t _msg_size) = 0;
+			details::message_base* msg = new (mem) _MsgTy(std::forward<_Args>(_args)...);
+			_post_message(msg);
+		}
+
+		virtual unsigned int async_count() const = 0;
+		virtual void async_count(unsigned int _c) = 0;
+
+		static core& get_core();
+	protected:
+		virtual void* _allocate_message(std::size_t _size) = 0;
+		virtual void _post_message(details::message_base* message) = 0;
 		virtual std::shared_ptr<tag> _add_default_tag(const std::type_info& _ty, const std::shared_ptr<tag>& _tag) = 0;
 	};
 }

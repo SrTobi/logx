@@ -1,7 +1,7 @@
 #include <unordered_map>
 #include <typeindex>
 #include "logx/sink.hpp"
-#include "logx/details/message.hpp"
+#include "logx/details/base_message.hpp"
 
 namespace logx {
 

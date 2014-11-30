@@ -4,7 +4,18 @@
 #include <array>
 #include <unordered_map>
 #include <typeindex>
+#include <functional>
+
+
+#if defined(WIN32) && !defined(_WIN32_WINNT)
+#	define _WIN32_WINNT 0x0501
+#endif
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/strand.hpp>
+namespace asio = boost::asio;
+
 #include "logx/core.hpp"
+#include "logx/core_service.hpp"
 #include "logx/sink.hpp"
 #include "logx/tag.hpp"
 #include "logx/text_sink.hpp"
@@ -21,15 +32,11 @@ namespace logx {
 		{
 		public:
 			core_impl()
-				: mRunning(true)
+				: mService(&mOwnService)
 			{
-#ifdef LOGXCFG_USE_WCHAR
-				auto sink = std::make_shared<text_sink>(std::wcout);
-#else
 				auto sink = std::make_shared<text_sink>(std::cout);
-#endif
+
 				mSinks.push_back(std::bind(&text_sink::on_message, sink, std::placeholders::_1));
-				_start();
 			}
 
 			virtual ~core_impl() override
@@ -38,22 +45,56 @@ namespace logx {
 			}
 
 
-			virtual void init() override
-			{
-				std::lock_guard<std::mutex> lock(mSinkMutex);
-				mSinks.clear();
-			}
-
 			virtual void add_sink(sink _sink) override
 			{
 				std::lock_guard<std::mutex> lock(mSinkMutex);
 				mSinks.push_back(_sink);
 			}
 
+			virtual void remove_all_sinks() override
+			{
+				std::lock_guard<std::mutex> lock(mSinkMutex);
+				mSinks.clear();
+			}
+
+
 			virtual bool remove_default_tag(const std::type_info& _ty) override
 			{
 				std::lock_guard<std::mutex> lock(mSinkMutex);
 				return mDefaultTags.erase(_ty) > 0;
+			}
+
+			virtual unsigned int async_count() const
+			{
+				return 0;
+			}
+
+			virtual void async_count(unsigned int _c)
+			{
+			}
+
+
+
+
+			asio::io_service& service()
+			{
+				return *mService;
+			}
+
+			void reset_service(asio::io_service* _service)
+			{
+				if (!_service)
+				{
+					_service = &mOwnService;
+				}
+
+				if (_service == mService)
+				{
+					return;
+				}
+
+				// reset service
+				assert(0);
 			}
 
 		protected:
@@ -76,17 +117,20 @@ namespace logx {
 
 			void _start()
 			{
-#ifndef LOGXCFG_SYNC
-				mWorkerThread = std::thread(std::bind(&core_impl::_work, this));
-#endif
+				std::lock_guard<std::mutex> lock(mSinkMutex);
+
+				/*if (mServiceWork)
+					return;
+
+				mServiceWork.reset(new asio::io_service::work(mService));
+
+				auto process = [this](){ mService.run(); };
+				//mWorkerThread = std::thread(std::move(process));*/
 			}
 
 			void _stop()
 			{
-#ifndef LOGXCFG_SYNC
-				mRunning = false;
-				mWorkerThread.join();
-#endif
+				//mServiceWork.reset();
 			}
 
 
@@ -111,52 +155,26 @@ namespace logx {
 				}
 			}
 
-#ifdef LOGXCFG_SYNC
-			struct _sync_creator : public core::_msg_creator
+
+			virtual void* _allocate_message(std::size_t _size) override
 			{
-				_sync_creator(std::unique_lock<std::mutex>&& _mutex, core_impl* _core_impl)
-					: mutex(std::move(_mutex))
-					, core_impl(_core_impl)
-				{
-				}
-
-				virtual ~_sync_creator() override
-				{
-					::operator delete(msg_mem);
-				}
-
-				virtual void done(details::message_base* msg) override
-				{
-					core_impl->_send_sink(msg);
-					core_impl->mSyncCreator.destruct();
-				}
-
-				core_impl* core_impl;
-				std::unique_lock<std::mutex> mutex;
-			};
-
-			virtual core::_msg_creator* _get_creator(std::size_t _msg_size) override
-			{
-				std::unique_lock<std::mutex> lock(mMsgMutex);
-				mSyncCreator.construct(std::move(lock), this);
-
-				mSyncCreator->msg_mem = ::operator new(_msg_size);
-
-				return mSyncCreator.get();
+				return ::operator new(_size);
 			}
-#else
-#error Not implemented! Please define LOGXCFG_SYNC.
 
-			void _work()
+			virtual void _post_message(details::message_base* message) override
 			{
-				while (mRunning)
+				if (true /* sync ? */)
+				{
+					_send_sink(message);
+
+				}
+				else
 				{
 
 				}
 
-				std::cout << "Exit!" << std::endl;
+				service().post(std::bind(&core_impl::_send_sink, this, message));
 			}
-#endif
 
 		private:
 			std::vector<sink> mSinks;
@@ -165,18 +183,14 @@ namespace logx {
 			std::mutex mSinkMutex;
 			std::mutex mMsgMutex;
 
-			std::thread mWorkerThread;
-			bool mRunning;
-
-#ifdef LOGXCFG_SYNC
-			details::uninitialized<_sync_creator> mSyncCreator;
-#endif
+			asio::io_service* mService;
+			asio::io_service mOwnService;
 		};
 	}
 
 
 
-	// core stuff
+	// core
 	impl::core_impl GLCore;
 
 	core::~core()
@@ -186,5 +200,24 @@ namespace logx {
 	core& core::get_core()
 	{
 		return GLCore;
+	}
+
+
+	// core service
+	core_service::core_service(boost::asio::io_service& _service)
+		: mService(_service)
+	{
+		GLCore.reset_service(&_service);
+	}
+
+	core_service::~core_service()
+	{
+		if(active())
+			GLCore.reset_service(nullptr);
+	}
+
+	bool core_service::active() const
+	{
+		return &(GLCore.service()) == &mService;
 	}
 }

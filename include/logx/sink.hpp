@@ -3,7 +3,6 @@
 #define _LOGX_SINK_HPP
 
 #include <typeinfo>
-#include "details/message.hpp"
 #include "core.hpp"
 
 namespace logx {

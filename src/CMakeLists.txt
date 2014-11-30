@@ -6,7 +6,17 @@ buildx_auto_group("${LOGX_PUBLIC_INCLUDES}")
 
 # add library
 include_directories(.)
+if(WIN32)
+	SET(Boost_USE_STATIC_LIBS ON)
+endif()
+find_package(Boost COMPONENTS system REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
+
+
+
 add_library(logx SHARED ${LOGX_SOURCE} ${LOGX_PUBLIC_INCLUDES})
+target_link_libraries(logx ${Boost_LIBRARIES})
 buildx_export_header(logx
 					DESTINATION_FILE "LOGX_PUBLIC_INCLUDES"
 					DESTINATION_DIR "LOGX_EXPORT_API_DIR"
