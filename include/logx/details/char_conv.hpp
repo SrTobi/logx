@@ -47,25 +47,6 @@ namespace logx {
 
 
 
-#ifdef LOGXCFG_USE_WCHAR
-		static string to_string(std::wstring _str)
-		{
-			return _str;
-		}
-
-		static string to_string(const std::string& _str)
-		{
-			return convert_wstring(_str);
-		}
-
-		template<typename T>
-		string std_to_string(const T& _var)
-		{
-			return std::to_wstring(_var);
-		}
-
-#else
-
 		static string to_string(std::string _str)
 		{
 			return _str;
@@ -82,7 +63,6 @@ namespace logx {
 			return std::to_string(_var);
 		}
 
-#endif
 
 		namespace streaming_fallback
 		{
