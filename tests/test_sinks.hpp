@@ -27,6 +27,7 @@ namespace test_sinks {
 
 		logx::string pop_front()
 		{
+			BOOST_REQUIRE(!mMsgList.empty());
 			auto r = mMsgList.front();
 			mMsgList.pop_front();
 			return r;
