@@ -88,10 +88,14 @@ namespace logx {
 					while (!mIsRunning && mShouldRun) {}
 				}
 
+				++mInits;
 			}
 
 			virtual void exit(bool force) override
 			{
+				if (--mInits > 0)
+					return;
+
 				if (mIsRunning)
 				{
 					mShouldFlush = true;
@@ -188,6 +192,7 @@ namespace logx {
 			std::atomic<bool> mShouldRun = true;
 			std::atomic<bool> mIsRunning = false;
 			std::atomic<bool> mShouldFlush = false;
+			std::atomic<unsigned int> mInits = 0;
 
 			boost::lockfree::queue<details::message_base*> mMessageQueue;
 		};
