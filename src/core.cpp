@@ -54,7 +54,8 @@ namespace logx {
 
 			virtual ~core_impl() override
 			{
-				mWorkerThread.detach();
+				if(mWorkerThread.joinable())
+					mWorkerThread.detach();
 			}
 
 
@@ -156,23 +157,27 @@ namespace logx {
 						
 					}
 
-					std::lock_guard<std::mutex> lock(mSinkMutex);
-					sink_message_impl sink_msg(msg, mDefaultTags);
-
-					for (auto& sink : mSinks)
-					{
-						try
-						{
-							sink(sink_msg);
-						}
-						catch (...)
-						{
-							// ignore exceptions and go on
-						}
-					}
-
-					delete msg;
+					_send_message_to_sink(msg);
 				}
+			}
+
+			void _send_message_to_sink(details::message_base* msg)
+			{
+				std::lock_guard<std::mutex> lock(mSinkMutex);
+				sink_message_impl sink_msg(msg, mDefaultTags);
+
+				for (auto& sink : mSinks)
+				{
+					try
+					{
+						sink(sink_msg);
+					}
+					catch (...)
+					{
+						// ignore exceptions and go on
+					}
+				}
+				delete msg;
 			}
 
 
@@ -183,8 +188,14 @@ namespace logx {
 
 			virtual void _post_message(details::message_base* message) override
 			{
-				if(!mShouldFlush)
-					mMessageQueue.push(message);
+				if (mThreaded)
+				{
+					if (!mShouldFlush)
+						mMessageQueue.push(message);
+				}
+				else{
+					_send_message_to_sink(message);
+				}
 			}
 
 			static void _global_exit();
@@ -202,6 +213,7 @@ namespace logx {
 			std::atomic<bool> mIsRunning = false;
 			std::atomic<bool> mShouldFlush = false;
 			std::atomic<unsigned int> mInits = 0;
+			bool mThreaded = false;
 
 			boost::lockfree::queue<details::message_base*> mMessageQueue;
 		};
