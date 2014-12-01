@@ -81,6 +81,7 @@ namespace logx {
 			{
 				auto fh = std::make_shared<future_handler>(this);
 
+				// set the new fh as new mLastHandler, while getting it, so fh can be set prev->next
 				auto prev = std::atomic_exchange(&mLastHandler, fh);
 
 				assert(!prev->next);
@@ -99,6 +100,7 @@ namespace logx {
 			void _flush()
 			{
 			again:
+				// lock by setting mFirstHandler to zero
 				auto first = std::atomic_exchange(&mFirstHandler, fh_ptr());
 
 				// If first is zero, another thread is executing flush
@@ -110,18 +112,24 @@ namespace logx {
 				{
 					auto& next = first->next;
 
-					// there is no next node -> exit
+					// there is no next node or the next node is not ready -> exit
 					if (!next || !next->task)
 					{
 						break;
 					}
 
-					// if there is a task, dispatch it 
+					// if there is a task, dispatch it (note that the task is reseted)
 					mStrand.dispatch(std::move(next->task));
 					first = std::move(next);
 				}
 
+				// unlock by setting mFirstHandler
 				mFirstHandler = first;
+
+				// It might happen, that directly after the "!next || !next->task" a next task was set!
+				// Further the other thread has loaded an empty mFirstHandler, which means it would stop flushing!
+				// So we have to take care in this thread that next and next->task are empty, while mFirstHandler is set!
+				// Otherwise we start over and see if the other thread has really seen the non-empty mFirstHandler and is executing flush.
 				auto next = first->next;
 				if (next && next->task)
 					goto again;
