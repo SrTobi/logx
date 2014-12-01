@@ -161,8 +161,17 @@ namespace logx {
 
 					for (auto& sink : mSinks)
 					{
-						sink(sink_msg);
+						try
+						{
+							sink(sink_msg);
+						}
+						catch (...)
+						{
+							// ignore exceptions and go on
+						}
 					}
+
+					delete msg;
 				}
 			}
 
