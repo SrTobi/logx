@@ -47,8 +47,6 @@ namespace logx {
 			_post_message(msg);
 		}
 
-		virtual unsigned int async_count() const = 0;
-		virtual void async_count(unsigned int _c) = 0;
 
 		static core& get_core();
 	protected:

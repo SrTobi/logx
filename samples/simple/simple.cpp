@@ -21,6 +21,6 @@ int main()
 
 	logx::log("here comes a string again: $1", "bye");
 
-	std::cin.get();
+	//std::cin.get();
 	return 0;
 }
