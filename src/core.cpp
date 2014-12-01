@@ -20,35 +20,38 @@ namespace asio = boost::asio;
 #include "logx/tag.hpp"
 #include "logx/text_sink.hpp"
 #include <logx/logx_api.hpp>
+#include <atomic>
 
 #include "sink_message.hpp"
+#include "future_strand.hpp"
 #include "memory.hpp"
 
 namespace logx {
 
 	namespace impl {
 
-		class core_impl : public core
+		class core_impl final : public core
 		{
 		public:
 			core_impl()
-				: mService(&mOwnService)
+				: mService(nullptr)
+				, mSynchronous(true)
+				, mPipelineState(PipelineState::Stoped)
 			{
 				auto sink = std::make_shared<text_sink>(std::cout);
 
-				mSinks.push_back(std::bind(&text_sink::on_message, sink, std::placeholders::_1));
+				add_sink(std::bind(&text_sink::on_message, sink, std::placeholders::_1));
 			}
 
 			virtual ~core_impl() override
 			{
-				_stop();
 			}
 
 
 			virtual void add_sink(sink _sink) override
 			{
 				std::lock_guard<std::mutex> lock(mSinkMutex);
-				mSinks.push_back(_sink);
+				mSinks.emplace_back(_sink);
 			}
 
 			virtual void remove_all_sinks() override
@@ -64,7 +67,7 @@ namespace logx {
 				return mDefaultTags.erase(_ty) > 0;
 			}
 
-			virtual unsigned int async_count() const
+			virtual unsigned int async_count() const override
 			{
 				return 0;
 			}
@@ -74,11 +77,9 @@ namespace logx {
 			}
 
 
-
-
-			asio::io_service& service()
+			virtual bool synchronous() const
 			{
-				return *mService;
+				return mSynchronous;
 			}
 
 			void reset_service(asio::io_service* _service)
@@ -115,26 +116,8 @@ namespace logx {
 				}
 			}
 
-			void _start()
-			{
-				std::lock_guard<std::mutex> lock(mSinkMutex);
 
-				/*if (mServiceWork)
-					return;
-
-				mServiceWork.reset(new asio::io_service::work(mService));
-
-				auto process = [this](){ mService.run(); };
-				//mWorkerThread = std::thread(std::move(process));*/
-			}
-
-			void _stop()
-			{
-				//mServiceWork.reset();
-			}
-
-
-			void _notify_message(log_thread& _thread)
+			/*void _notify_message(log_thread& _thread)
 			{
 				//while (_thread.mMessages.size())
 				//{
@@ -142,9 +125,9 @@ namespace logx {
 				//	_send_sink(msg.get());
 				//	_thread.mMessages.pop_front();
 				//}
-			}
+			}*/
 
-			void _send_sink(details::message_base* msg)
+			void _send_sink_synchronous(details::message_base* msg)
 			{
 				sink_message_impl sink_msg(msg, mDefaultTags);
 
@@ -161,25 +144,96 @@ namespace logx {
 				return ::operator new(_size);
 			}
 
+			/************************************** Message pipeline **************************************/
+			enum class PipelineState
+			{
+				Running,
+				Stoped,
+				Ending
+			};
+
+			void _start_message_pipeline()
+			{
+				if (!synchronous())
+				{
+					return;
+				}
+				assert(mService);
+				mMakeMessageStrand.reset(new details::future_strand(*mService));
+				mSinkStrands.clear();
+				for (unsigned int i = 0; i < mSinks.size(); ++i)
+					mSinkStrands.emplace_back(*mService);
+
+				mSynchronous = false;
+			}
+
+			std::unique_lock<std::mutex> _end_message_pipeline()
+			{
+				std::lock_guard<std::mutex> lck(mEmptyPipelineMutex);
+
+			}
+
 			virtual void _post_message(details::message_base* message) override
 			{
-				if (true /* sync ? */)
+				if(mPipelineState != )
+
+
+				auto handler = mMakeMessageStrand->wrap([this](sink_message_impl* msg)
 				{
-					_send_sink(message);
-
-				}
-				else
-				{
-
-				}
-
-				service().post(std::bind(&core_impl::_send_sink, this, message));
+					_send_message_to_sink(0, msg);
+				});
+					
+				mService->post(
+				[this, message, handler]{
+					_make_sink_messsage(message, handler);
+				});
 			}
+
+
+			template<typename Handler>
+			void _make_sink_messsage(details::message_base* message, Handler handler)
+			{
+				sink_message_impl* msg = new sink_message_impl(message, mDefaultTags);
+
+				handler(std::move(msg));
+			}
+
+			void _send_message_to_sink(unsigned int sink_idx, sink_message_impl* msg)
+			{
+				if (sink_idx < mSinks.size())
+				{
+					auto& strand = mSinkStrands.at(sink_idx);
+
+					strand.dispatch(std::bind(&core_impl::_do_send_message_to_sink, this, sink_idx, std::move(msg)));
+				}
+				else{
+					delete msg;
+				}
+			}
+
+			void _do_send_message_to_sink(unsigned int sink_idx, sink_message_impl* msg)
+			{
+				auto& sink = mSinks.at(sink_idx);
+				sink(*msg);
+
+				_send_message_to_sink(sink_idx + 1, msg);
+			}
+
+		private:
+			std::atomic<PipelineState> mPipelineState;
+			std::mutex mEmptyPipelineMutex;
+			std::unique_ptr<details::future_strand> mMakeMessageStrand;
+			std::vector<asio::io_service::strand> mSinkStrands;
+
+
+			/************************************** Message pipeline end **************************************/
 
 		private:
 			std::vector<sink> mSinks;
 			std::unordered_map<std::type_index, std::shared_ptr<tag>> mDefaultTags;
 
+			bool mSynchronous;
+			std::mutex mSyncMutex;
 			std::mutex mSinkMutex;
 			std::mutex mMsgMutex;
 
@@ -218,6 +272,6 @@ namespace logx {
 
 	bool core_service::active() const
 	{
-		return &(GLCore.service()) == &mService;
+		return 0;
 	}
 }
