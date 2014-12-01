@@ -47,12 +47,27 @@ namespace logx {
 			_post_message(msg);
 		}
 
+		virtual void init() = 0;
+		virtual void exit(bool force = false) = 0;
 
 		static core& get_core();
 	protected:
 		virtual void* _allocate_message(std::size_t _size) = 0;
 		virtual void _post_message(details::message_base* message) = 0;
 		virtual std::shared_ptr<tag> _add_default_tag(const std::type_info& _ty, const std::shared_ptr<tag>& _tag) = 0;
+	};
+
+	struct backend
+	{
+		backend()
+		{
+			core::get_core().init();
+		}
+
+		~backend()
+		{
+			core::get_core().exit();
+		}
 	};
 }
 

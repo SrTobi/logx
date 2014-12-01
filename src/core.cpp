@@ -76,6 +76,35 @@ namespace logx {
 				std::lock_guard<std::mutex> lock(mSinkMutex);
 				return mDefaultTags.erase(_ty) > 0;
 			}
+
+			virtual void init() override
+			{
+				std::lock_guard<std::mutex> lock(mSinkMutex);
+				if (!mIsRunning && mShouldRun)
+				{
+					mWorkerThread = std::thread(std::bind(&core_impl::_worker_run, this));
+
+					// spinlock until worker is running
+					while (!mIsRunning && mShouldRun) {}
+				}
+
+			}
+
+			virtual void exit(bool force) override
+			{
+				if (mIsRunning)
+				{
+					mShouldFlush = true;
+					if (force)
+						mShouldRun = false;
+
+					while (mIsRunning)
+					{
+						std::this_thread::sleep_for(std::chrono::milliseconds(1));
+					}
+				}
+
+			}
 		protected:
 			virtual std::shared_ptr<tag> _add_default_tag(const std::type_info& _ty, const std::shared_ptr<tag>& _tag) override
 			{
@@ -141,22 +170,8 @@ namespace logx {
 
 			virtual void _post_message(details::message_base* message) override
 			{
-				if (mShouldFlush)
-					return;
-
-				mMessageQueue.push(message);
-
-				if (!mIsRunning)
-				{
-					std::lock_guard<std::mutex> lock(mSinkMutex);
-					if (!mIsRunning && mShouldRun)
-					{
-						mWorkerThread = std::thread(std::bind(&core_impl::_worker_run, this));
-
-						// spinlock
-						while (!mIsRunning && mShouldRun) {}
-					}
-				}
+				if(!mShouldFlush)
+					mMessageQueue.push(message);
 			}
 
 			static void _global_exit();
