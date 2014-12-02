@@ -2,6 +2,8 @@
 #include <typeindex>
 #include "logx/sink.hpp"
 #include "logx/details/base_message.hpp"
+#include "logx/tag.hpp"
+#include "logx/annotation.hpp"
 
 namespace logx {
 
@@ -14,18 +16,17 @@ namespace logx {
 
 
 			virtual const string& msg() const override;
-			virtual const std::vector<string>& args() const override;
+			virtual const std::vector<const annotation*>& annotations() const override;
 			virtual const std::vector<const tag*>& tags() const override;
 
 		protected:
 			virtual const tag* _get_tag(const std::type_info& _ty) const override;
 
 		private:
-			details::message_base* mMessage;
-			string mDescription;
-			std::vector<const message_arg*> mArgs;
-			std::vector<string> mArgsAsString;
-			mutable std::vector<const tag*> mTagList;
+			details::message_base* mBaseMessage;
+			string mMessage;
+			std::vector<const annotation*> mAnnotations;
+			std::vector<const tag*> mTagList;
 			std::unordered_map<std::type_index, const tag*> mTags;
 		};
 	}

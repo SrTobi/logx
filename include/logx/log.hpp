@@ -3,16 +3,17 @@
 #define _LOGX_LOG_
 
 #include <memory>
+#include "details/list_message.hpp"
 #include "core.hpp"
 
 namespace logx {
 
 
-	template<typename _MsgTy, typename... _Args>
-	void log(_MsgTy&& _msg, _Args&&... _args)
+	template<typename... _Args>
+	void log(_Args&&... _args)
 	{
 		core::get_core()
-			.add_log_message<details::message<_MsgTy, _Args...>>(std::forward<_MsgTy>(_msg), std::forward<_Args>(_args)...);
+			.add_log_message<details::list_message<sizeof...(_Args), _Args...>>(std::forward<_Args>(_args)...);
 	}
 
 }

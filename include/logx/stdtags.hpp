@@ -3,6 +3,7 @@
 #define _LOGX_STDTAGS_HPP
 
 #include <thread>
+#include <sstream>
 #include "details/char_conv.hpp"
 #include "tag.hpp"
 
@@ -127,7 +128,7 @@ namespace logx {
 
 			virtual string value() const override
 			{
-				std::basic_ostringstream<char> stream;
+				std::ostringstream stream;
 				stream << mThreadId;
 				return stream.str();
 			}

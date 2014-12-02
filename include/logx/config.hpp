@@ -2,6 +2,7 @@
 #ifndef _LOGX_CONFIG_HPP
 #define _LOGX_CONFIG_HPP
 
+#include <string>
 
 // #define LOGXCFG_FORCE_DEBUG_BUILD
 // #define LOGXCFG_FORCE_DEBUG_LOG
