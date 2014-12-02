@@ -64,7 +64,7 @@ namespace logx {
 
 namespace std {
 	template<typename Ch, typename It>
-	std::basic_ostream<Ch>& operator << (std::basic_ostream<Ch>& _stream, logx::details::container_arg<It, logx::details::sequence_iterator_tag> _it)
+	std::basic_ostream<Ch>& operator << (std::basic_ostream<Ch>& _stream, const logx::details::container_arg<It, logx::details::sequence_iterator_tag>& _it)
 	{
 		auto& begin = _it.begin();
 		auto& end = _it.end();
@@ -84,7 +84,7 @@ namespace std {
 	}
 
 	template<typename Ch, typename It>
-	std::basic_ostream<Ch>& operator << (std::basic_ostream<Ch>& _stream, logx::details::container_arg<It, logx::details::map_iterator_tag> _it)
+	std::basic_ostream<Ch>& operator << (std::basic_ostream<Ch>& _stream, const logx::details::container_arg<It, logx::details::map_iterator_tag>& _it)
 	{
 		auto& begin = _it.begin();
 		auto& end = _it.end();
@@ -104,7 +104,7 @@ namespace std {
 	}
 
 	template<typename Ch, typename It>
-	std::basic_ostream<Ch>& operator << (std::basic_ostream<Ch>& _stream, logx::details::container_arg<It, logx::details::set_iterator_tag> _it)
+	std::basic_ostream<Ch>& operator << (std::basic_ostream<Ch>& _stream, const logx::details::container_arg<It, logx::details::set_iterator_tag>& _it)
 	{
 		auto& begin = _it.begin();
 		auto& end = _it.end();
