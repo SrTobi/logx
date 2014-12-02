@@ -17,6 +17,107 @@
 namespace logx {
 	namespace details {
 
+
+
+		template<typename From>
+		class is_constructible_from_impl
+		{
+		public:
+			static From creator_func();
+
+			template<typename T>
+			static std::true_type test(decltype(T(creator_func()))* arg = nullptr);
+
+			static std::false_type test(...);
+		};
+
+		template<typename T, typename From>
+		struct is_constructible_from
+			: decltype(is_constructible_from_impl<From>::test<T>())
+		{
+		};
+
+		template<typename T,
+			bool Copyable = is_constructible_from<typename std::decay<T>::type, T>::value>
+		class list_message_element_wrapper;
+
+		template<typename T>
+		class list_message_element_wrapper<T, true>
+		{
+		public:
+			template<typename Arg>
+			list_message_element_wrapper(Arg&& _arg)
+				: mValue(std::forward<Arg>(_arg))
+			{}
+
+			template<typename Base>
+			void push_if_based(std::vector<const Base*>& _target) const
+			{
+				_push_if_based(_target, &mValue);
+			}
+
+			void write_to_msg(std::ostringstream& os) const
+			{
+				_add_to_msg(os, &mValue);
+			}
+
+		private:
+			template<typename Base>
+			static void _push_if_based(std::vector<const Base*>& _target, const Base* _arg)
+			{
+				_target.push_back(_arg);
+			}
+
+			template<typename Base>
+			static void _push_if_based(std::vector<const Base*>& _target, const void* _arg)
+			{
+			}
+
+			static void _add_to_msg(std::ostringstream& _os, const tag& _val)
+			{
+			}
+
+			template<typename T>
+			static typename std::enable_if<!std::is_base_of<tag, T>::value>::type
+					_add_to_msg(std::ostringstream& _os, const T& _val)
+			{
+				using namespace additional_streams;
+				_os << _val;
+			}
+
+		private:
+			typename std::decay<T>::type mValue;
+		};
+
+		template<typename T>
+		class list_message_element_wrapper < T, false >
+		{
+		public:
+			list_message_element_wrapper(const typename std::decay<T>::type& _arg)
+			{
+				using namespace additional_streams;
+				std::ostringstream os;
+				os << _arg;
+				mValue = os.str();
+			}
+
+			template<typename Base>
+			void push_if_based(std::vector<const Base*>& _target) const
+			{
+			}
+
+			void write_to_msg(std::ostringstream& os) const
+			{
+				os << mMsgValue;
+			}
+			
+		private:
+			std::string mMsgValue;
+		};
+
+
+
+
 		template<std::size_t _ACount, typename... _Args>
 		class list_message : public message_base
 		{
@@ -65,22 +166,9 @@ namespace logx {
 				typename std::enable_if<(I < _ACount)>::type
 				_build_msg(std::ostringstream& _os) const
 			{
-				_add_to_msg(_os, std::get<I>(mArguments));
+				std::get<I>(mArguments).write_to_msg(_os);
 				_build_msg<I + 1>(_os);
 			}
-
-			static void _add_to_msg(std::ostringstream& _os, const tag& _val)
-			{
-			}
-
-			template<typename T>
-			static typename std::enable_if<!std::is_base_of<tag, T>::value>::type
-					_add_to_msg(std::ostringstream& _os, const T& _val)
-			{
-				using namespace additional_streams;
-				_os << _val;
-			}
-
 			/************************************** build tag/annotation vector **************************************/
 			template<std::size_t I = 0, class Base>
 				typename std::enable_if<I >= sizeof...(_Args)>::type
@@ -92,23 +180,13 @@ namespace logx {
 				typename std::enable_if<(I < sizeof...(_Args))>::type
 				_build(std::vector<const Base*>& _args) const
 			{
-				_push_if(_args, &std::get<I>(mArguments));
+				std::get<I>(mArguments).push_if_based(_args);
 				_build<I + 1>(_args);
 			}
 
-			template<typename Base>
-			static void _push_if(std::vector<const Base*>& _target, const Base* _arg)
-			{
-				_target.push_back(_arg);
-			}
-
-			template<typename Base>
-			static void _push_if(std::vector<const Base*>& _target, const void* _arg)
-			{
-			}
 
 		private:
-			std::tuple<typename std::decay<_Args>::type...> mArguments;
+			std::tuple<list_message_element_wrapper<_Args>...> mArguments;
 		};
 
 
