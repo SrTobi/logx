@@ -6,6 +6,25 @@
 #include <logx.hpp>
 #include <logx/sink.hpp>
 #include <logx/dump.hpp>
+#include <mutex>
+
+struct uncopyable
+{
+	uncopyable(){}
+	uncopyable(const uncopyable&&) = delete;
+	uncopyable(const uncopyable&) = delete;
+	uncopyable& operator=(const uncopyable&) = delete;
+
+private:
+	std::mutex xx;
+};
+
+std::ostream& operator << (std::ostream& os, const uncopyable& c)
+{
+	os << "[uncopyable]";
+	return os;
+}
+
 
 int main()
 {
@@ -23,9 +42,10 @@ int main()
 
 	//logx::log("here comes a string: " << 1.0f << ", test, " << L"wie gehts");
 
-	logx::log("here comes a string again: 1", 1, "bye");
+	uncopyable un;
+	logx::log("here comes a string again: 1", logx::nocp(un), "bye");
 
-	logx::logs() << "Hallo" << 1 << " wie gehts?" << logx::end;
+	//logx::logs() << "Hallo" << 1 << un << " wie gehts?" << logx::end;
 
 	std::cin.get();
 	return 0;

@@ -8,6 +8,11 @@
 
 namespace logx {
 
+	template<typename Arg>
+	details::uncopyable_element_wrapper<Arg> nocp(Arg& _arg)
+	{
+		return details::uncopyable_element_wrapper < Arg > {_arg};
+	}
 
 	template<typename... _Args>
 	void log(_Args&&... _args)

@@ -18,31 +18,14 @@ namespace logx {
 	namespace details {
 
 
-
-		template<typename From>
-		class is_constructible_from_impl
+		template<typename T>
+		struct uncopyable_element_wrapper
 		{
-		public:
-			static From creator_func();
-
-			template<typename T>
-			static std::true_type test(decltype(T(creator_func()))* arg = nullptr);
-
-			static std::false_type test(...);
+			const T& value;
 		};
-
-		template<typename T, typename From>
-		struct is_constructible_from
-			: decltype(is_constructible_from_impl<From>::test<T>())
-		{
-		};
-
-		template<typename T,
-			bool Copyable = is_constructible_from<typename std::decay<T>::type, T>::value>
-		class list_message_element_wrapper;
 
 		template<typename T>
-		class list_message_element_wrapper<T, true>
+		class list_message_element_wrapper
 		{
 		public:
 			template<typename Arg>
@@ -58,7 +41,7 @@ namespace logx {
 
 			void write_to_msg(std::ostringstream& os) const
 			{
-				_add_to_msg(os, &mValue);
+				_add_to_msg(os, mValue);
 			}
 
 		private:
@@ -86,19 +69,19 @@ namespace logx {
 			}
 
 		private:
-			typename std::decay<T>::type mValue;
+			T mValue;
 		};
 
 		template<typename T>
-		class list_message_element_wrapper < T, false >
+		class list_message_element_wrapper<uncopyable_element_wrapper<T> >
 		{
 		public:
-			list_message_element_wrapper(const typename std::decay<T>::type& _arg)
+			list_message_element_wrapper(const uncopyable_element_wrapper<T>& _arg)
 			{
 				using namespace additional_streams;
 				std::ostringstream os;
-				os << _arg;
-				mValue = os.str();
+				os << _arg.value;
+				mMsgValue = os.str();
 			}
 
 			template<typename Base>
@@ -186,7 +169,7 @@ namespace logx {
 
 
 		private:
-			std::tuple<list_message_element_wrapper<_Args>...> mArguments;
+			std::tuple<list_message_element_wrapper<typename std::decay<_Args>::type>...> mArguments;
 		};
 
 
