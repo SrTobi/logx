@@ -1,6 +1,7 @@
 #include <mutex>
 #include <iostream>
 #include <thread>
+#include <atomic>
 #include <array>
 #include <unordered_map>
 #include <typeindex>
@@ -45,6 +46,10 @@ namespace logx {
 		public:
 			core_impl()
 				: mMessageQueue(0)
+				, mShouldRun(true)
+				, mIsRunning(false)
+				, mShouldFlush(false)
+				, mInits(0)
 			{
 				std::atexit(&core_impl::_global_exit);
 				auto sink = std::make_shared<text_sink>(std::cout);
@@ -209,10 +214,10 @@ namespace logx {
 
 			std::mutex mSinkMutex;
 			std::thread mWorkerThread;
-			std::atomic<bool> mShouldRun = true;
-			std::atomic<bool> mIsRunning = false;
-			std::atomic<bool> mShouldFlush = false;
-			std::atomic<unsigned int> mInits = 0;
+			std::atomic<bool> mShouldRun;
+			std::atomic<bool> mIsRunning;
+			std::atomic<bool> mShouldFlush;
+			std::atomic<unsigned int> mInits;
 			bool mThreaded = false;
 
 			boost::lockfree::queue<details::message_base*> mMessageQueue;
