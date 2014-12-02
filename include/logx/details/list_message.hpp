@@ -60,9 +60,9 @@ namespace logx {
 			{
 			}
 
-			template<typename T>
-			static typename std::enable_if<!std::is_base_of<tag, T>::value>::type
-					_add_to_msg(std::ostringstream& _os, const T& _val)
+			template<typename _T>
+			static typename std::enable_if<!std::is_base_of<tag, _T>::value>::type
+					_add_to_msg(std::ostringstream& _os, const _T& _val)
 			{
 				using namespace additional_streams;
 				_os << _val;
