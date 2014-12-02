@@ -37,7 +37,7 @@ namespace logx {
 			template<typename NewA>
 			stream_pack_end<_Args..., NewA> operator [](NewA&& _newa)
 			{
-				return stream_pack_end<_Args, NewA>(std::tuple_cat(std::move(mArgs), std::forward_as_tuple(_newa)));
+				return stream_pack_end<_Args..., NewA>(std::tuple_cat(std::move(mArgs), std::forward_as_tuple(_newa)));
 			}
 
 			std::tuple<_Args...> mArgs;
