@@ -11,6 +11,7 @@ buildx_enable_debug()
 buildx_version_dir(LOGX_VERSION_DIR)
 buildx_set_default_prefixes()
 buildx_set_default_output_dirs()
+buildx_activate_cpp11()
 
 
 set(LOGX_PUBLIC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
