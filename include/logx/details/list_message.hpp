@@ -16,18 +16,15 @@
 
 namespace logx {
 	namespace details {
+
 		template<std::size_t _ACount, typename... _Args>
 		class list_message : public message_base
 		{
 			static_assert(_ACount <= sizeof...(_Args), "_ACount can not be greater than _Args");
 		public:
-			list_message(_Args&&... _args)
-				: mArguments(std::forward<_Args>(_args)...)
-			{
-			}
-
-			list_message(std::tuple<_Args...> _args)
-				: mArguments(std::move(_args))
+			template<typename... _AArgs>
+			list_message(_AArgs&&... _args)
+				: mArguments(std::forward<_AArgs>(_args)...)
 			{
 			}
 
@@ -111,7 +108,7 @@ namespace logx {
 			}
 
 		private:
-			std::tuple<_Args...> mArguments;
+			std::tuple<typename std::decay<_Args>::type...> mArguments;
 		};
 
 
