@@ -38,14 +38,15 @@ int main()
 	std::vector<int> vec = { 1, 2, 3 };
 
 
-	logx::log("here comes a string: ", logx::mapped(ages.begin(), ages.end()), logxSOURCE);
+	logx::log("here comes a string: ", logx::nocp(logx::mapped(ages.begin(), ages.end())), logxSOURCE);
 
 	//logx::log("here comes a string: " << 1.0f << ", test, " << L"wie gehts");
 
 	uncopyable un;
 	logx::log("here comes a string again: 1", logx::nocp(un), "bye");
 
-	//logx::logs() << "Hallo" << 1 << un << " wie gehts?" << logx::end;
+	//logx::logs() << "Hallo" << 1 << logx::nocp(un) << " wie gehts?" << logx::end[1];
+	logx::end[1];
 
 	std::cin.get();
 	return 0;
