@@ -25,6 +25,7 @@ int main()
 
 	logx::log("here comes a string again: 1", 1, "bye");
 
+	logx::logs() << "Hallo" << 1 << " wie gehts?" << logx::end;
 
 	std::cin.get();
 	return 0;

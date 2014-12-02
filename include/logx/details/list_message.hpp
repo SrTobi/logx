@@ -26,6 +26,11 @@ namespace logx {
 			{
 			}
 
+			list_message(std::tuple<_Args...> _args)
+				: mArguments(std::move(_args))
+			{
+			}
+
 			virtual string msg() const override
 			{
 				std::ostringstream os;
