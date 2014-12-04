@@ -3,6 +3,7 @@
 #define _LOGX_LOG_
 
 #include <memory>
+#include "details/tag_annotation_pack.hpp"
 #include "details/list_message.hpp"
 #include "core.hpp"
 
@@ -40,6 +41,12 @@ namespace logx {
 				return stream_pack_end<_Args..., NewA>(std::tuple_cat(std::move(mArgs), std::forward_as_tuple(_newa)));
 			}
 
+			template<typename... _AArgs>
+			stream_pack_end<_Args..., _AArgs...> operator [](tag_annotation_pack<_AArgs...>&& _pack)
+			{
+				return stream_pack_end<_Args..., _AArgs...>(std::tuple_cat(mArgs, _pack.mValues));
+			}
+
 			std::tuple<_Args...> mArgs;
 		};
 
@@ -50,7 +57,7 @@ namespace logx {
 			stream_pack()
 			{}
 
-			stream_pack(std::tuple<_Args...> _args)
+			stream_pack(std::tuple<_Args...>&& _args)
 				: mArgs(std::move(_args))
 			{
 			}

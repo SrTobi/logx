@@ -7,6 +7,7 @@
 #include <string>
 #include <ostream>
 #include "config.hpp"
+#include "details/tag_annotation_pack.hpp"
 
 namespace logx {
 
@@ -18,6 +19,7 @@ namespace logx {
 		virtual ~tag() {}
 		virtual string name() const = 0;
 		virtual string value() const = 0;
+
 	};
 
 
@@ -58,7 +60,9 @@ namespace logx {
 		inline virtual string name() const override { return #_name; }																	\
 		inline virtual string _build_value(const tuple_type& _args) const override														\
 		{ return _val_build; }																											\
-	};
+	};																																	\
+		template<typename T> ::logx::details::tag_annotation_pack<_name, T> operator, (_name&& _val, T&& _add)							\
+		{ return ::logx::details::tag_annotation_pack<_name, T>(std::make_tuple(std::move(_val), std::forward<T>(_add))); }			
 }
 
 
