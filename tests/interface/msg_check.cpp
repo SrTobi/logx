@@ -25,31 +25,16 @@ struct SinkInitFixture
 
 	void check_simple_logging()
 	{
-		logx::log("test-1");
+		logx::log() << "test-1" << logx::end;
 		check("test-1");
 
-		logx::log("linebreak in 3 2 1\nok");
+		logx::log() << "linebreak in 3 2 1\nok" << logx::end;
 		check("linebreak in 3 2 1\nok");
 	}
 
-	void check_direct_arg_loggin()
-	{
-		logx::log("test $1", "test");
-		check("test test");
-
-		logx::log("$1$2$3", 1, 2, 3);
-		check("123");
-
-		logx::log("$1 $2 $3", 1, 2, 3);
-		check("1 2 3");
-
-		logx::log("$1 $2 $3", 1, "test", 3.5);
-		check("1 test 3.5");
-	}
 };
 
 
 TESTX_START_FIXTURE_TEST(SinkInitFixture)
 	TESTX_FIXTURE_TEST(check_simple_logging);
-	TESTX_FIXTURE_TEST(check_direct_arg_loggin);
 TESTX_END_FIXTURE_TEST();
