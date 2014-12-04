@@ -7,7 +7,7 @@
 #include <string>
 #include <ostream>
 #include "config.hpp"
-#include "details/tag_annotation_pack.hpp"
+#include "details/stream_packs.hpp"
 
 namespace logx {
 
