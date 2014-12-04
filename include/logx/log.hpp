@@ -62,11 +62,11 @@ namespace logx {
 			}
 
 			template<typename... _AArgs>
-			void operator << (stream_pack_end<_AArgs...>& _streamp)
+			void operator << (stream_pack_end<_AArgs...>&& _streamp)
 			{
 				auto ma = std::tuple_cat(std::move(mArgs), std::move(_streamp.mArgs));
 				core::get_core()
-					.add_log_message<details::list_message<sizeof...(_AArgs), decltype(ma)>>(std::move(ma));
+					.add_log_message<details::list_message<sizeof...(_Args), _Args..., _AArgs...>>(std::move(ma));
 			}
 
 			std::tuple<_Args...> mArgs;
