@@ -3,25 +3,9 @@
 #define _LOGX_LOG_
 
 #include <memory>
-#include "details/stream_packs.hpp"
 #include "details/list_message.hpp"
 #include "core.hpp"
-
-namespace logx {
-
-	template<typename Arg>
-	details::uncopyable_element_wrapper<Arg> nocp(Arg& _arg)
-	{
-		return details::uncopyable_element_wrapper < Arg > {_arg};
-	}
-
-	inline details::stream_pack<> log()
-	{
-		return details::stream_pack<>();
-	}
-
-	static details::stream_pack_end<> end;
-}
+#include "logger.hpp"
 
 #ifndef LOGX_NO_LOG_MARCOS
 
@@ -43,7 +27,7 @@ struct logx_call_helper
 
 
 
-#define logxRAWLOG(...)		logx_call_helper::log() << __VA_ARGS__ << ::logx::end
+#define logxRAWLOG(...)		log() << __VA_ARGS__ << ::logx::end
 #define logxLOG(...)		logxRAWLOG(__VA_ARGS__)[::logx::tags::time(), logxSOURCE, ::logx::tags::thread()]
 
 #ifdef LOGX_PUBLISH

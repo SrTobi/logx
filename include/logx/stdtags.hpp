@@ -7,6 +7,7 @@
 #include "config.hpp"
 #include "details/char_conv.hpp"
 #include "tag.hpp"
+#include "logger.hpp"
 
 
 #ifndef __FUNCTION__

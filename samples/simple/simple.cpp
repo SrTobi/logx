@@ -29,7 +29,7 @@ std::ostream& operator << (std::ostream& os, const uncopyable& c)
 
 int main()
 {
-	logx::backend logger;
+	logx::backend logbackend;
 
 	std::set<float> xx = { 4.0f, 9.3f, 8.4f };
 	std::map<std::string, int> ages;
@@ -39,14 +39,16 @@ int main()
 	std::vector<int> vec = { 1, 2, 3 };
 
 
-	logxINFO("here comes a string: " << logx::mapped(ages.begin(), ages.end()));
+	logx::logger<logx::tags::cat> logger { "test" };
+
+	logger.logxINFO("here comes a string: " << logx::mapped(ages.begin(), ages.end()));
 
 	//logx::log("here comes a string: " << 1.0f << ", test, " << L"wie gehts");
 
 	uncopyable un;
-	logxWARN("here comes a string again: 1" << logx::nocp(un) << "bye");
+	logx::logxWARN("here comes a string again: 1" << logx::nocp(un) << "bye");
 
-	logxERROR("Hallo" << 1 << logx::nocp(un) << " wie gehts?");
+	logx::logxERROR("Hallo" << 1 << logx::nocp(un) << " wie gehts?");
 
 	std::cin.get();
 	return 0;

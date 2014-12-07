@@ -8,7 +8,6 @@
 #include <ostream>
 #include "config.hpp"
 #include "logx/logx_api.hpp"
-#include "details/stream_packs.hpp"
 
 namespace logx {
 
