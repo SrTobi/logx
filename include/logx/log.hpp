@@ -49,7 +49,7 @@ struct logx_call_helper
 #ifdef LOGX_PUBLISH
 #	define logxTRACE(...)	logx_call_helper::dummy()
 #else
-#	define logxTRACE(...)	logxLOG(__VA_ARGS)[trace]
+#	define logxTRACE(...)	logxLOG(__VA_ARGS)[::logx::tags::trace]
 #endif
 
 #define logxDEBUG(...)		logxLOG(__VA_ARGS__)[::logx::tags::debug]
