@@ -99,8 +99,8 @@ namespace logx {
 
 		static log_level trace(details::_log_level::TRACE);
 		static log_level debug(details::_log_level::DEBUG);
+		static log_level detail(details::_log_level::DETAIL);
 		static log_level info(details::_log_level::INFO);
-		static log_level detail(details::_log_level::INFO);
 		static log_level warning(details::_log_level::WARNING);
 		static log_level error(details::_log_level::ERR);
 		static log_level fatal(details::_log_level::FATAL);
