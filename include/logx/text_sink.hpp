@@ -24,6 +24,7 @@ namespace logx {
 				, show_category(true)
 				, show_loglevel(true)
 				, show_time(true)
+				, show_source(true)
 			{
 			}
 
@@ -48,20 +49,32 @@ namespace logx {
 						mStream << '[' << cat_tag->value() << ']';
 				}
 
+				const tags::log_level* ll_tag = nullptr;
 				if (show_loglevel)
 				{
-					const tags::log_level* ll_tag = msg.get_tag<tags::log_level>();
+					ll_tag = msg.get_tag<tags::log_level>();
 
 					if (ll_tag)
 						mStream << ll_tag->value() << ':' << ' ';
 				}
 
-				mStream << msg.msg() << std::endl;
+				mStream << msg.msg();
+
+				if (show_source && ll_tag && ll_tag->level() >= tags::log_levels::ERR)
+				{
+					const tags::source* src_tag = msg.get_tag<tags::source>();
+
+					if (src_tag)
+						mStream << " [" << src_tag->value() << ']';
+				}
+
+				mStream << std::endl;
 			}
 
 			bool show_category;
 			bool show_loglevel;
 			bool show_time;
+			bool show_source;
 		private:
 			stream_type& mStream;
 		};
