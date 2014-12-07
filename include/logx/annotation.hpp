@@ -17,7 +17,7 @@ namespace logx {
 		virtual ~annotation() {}
 		virtual const std::string& name() const = 0;
 		virtual const std::string& value() const = 0;
-		virtual const std::vector<annotation*>& annotations() const = 0;
+		virtual const std::vector<const annotation*>& annotations() const = 0;
 	};
 
 
