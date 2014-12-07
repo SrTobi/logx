@@ -5,9 +5,9 @@
 #include <memory>
 #include <iostream>
 #include <fstream>
-#include "config.hpp"
-#include "sink.hpp"
-#include "stdtags.hpp"
+#include "../config.hpp"
+#include "../sink.hpp"
+#include "../stdtags.hpp"
 
 namespace logx {
 

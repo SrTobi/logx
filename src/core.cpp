@@ -13,7 +13,7 @@
 #include "logx/core.hpp"
 #include "logx/sink.hpp"
 #include "logx/tag.hpp"
-#include "logx/text_sink.hpp"
+#include "logx/sinks/text_sink.hpp"
 #include <logx/logx_api.hpp>
 
 #include "sink_message.hpp"

@@ -5,7 +5,7 @@
 #include <set>
 #include <logx.hpp>
 #include <logx/sink.hpp>
-#include <logx/text_sink.hpp>
+#include <logx/sinks/text_sink.hpp>
 #include <logx/dump.hpp>
 #include <mutex>
 
