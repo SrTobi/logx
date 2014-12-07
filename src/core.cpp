@@ -114,6 +114,7 @@ namespace logx {
 					}
 				}
 
+				remove_all_sinks();
 			}
 		protected:
 			virtual std::shared_ptr<tag> _add_default_tag(const std::type_info& _ty, const std::shared_ptr<tag>& _tag) override
