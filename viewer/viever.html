@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title>Log Viewer</title>
+	<script src="viewer.js" type="text/javascript"></script>
+	
+	<script type="text/javascript">
+		
+		function LoadLog()
+		{
+			var xml = LoadXmlLog("test-log.xml");
+			FillContextDiv(document.getElementById("log_script_context"), xml, null);
+		}
+		
+		
+		
+	</script>
+	
+</head>
+<body>
+
+	<input type="button" value="load" onclick="LoadLog()" />
+
+	<div id="log_script_context">
+
+	</div>
+
+
+
+</body>
+</html>
