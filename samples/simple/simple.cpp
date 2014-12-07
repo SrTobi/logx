@@ -5,6 +5,7 @@
 #include <set>
 #include <logx.hpp>
 #include <logx/sink.hpp>
+#include <logx/text_sink.hpp>
 #include <logx/dump.hpp>
 #include <mutex>
 
@@ -38,15 +39,14 @@ int main()
 	std::vector<int> vec = { 1, 2, 3 };
 
 
-	logx::log("here comes a string: ", logx::nocp(logx::mapped(ages.begin(), ages.end())), logxSOURCE);
+	logxINFO("here comes a string: " << logx::mapped(ages.begin(), ages.end()));
 
 	//logx::log("here comes a string: " << 1.0f << ", test, " << L"wie gehts");
 
 	uncopyable un;
-	logx::log("here comes a string again: 1", logx::nocp(un), "bye");
+	logxWARN("here comes a string again: 1" << logx::nocp(un) << "bye");
 
-	//logx::logs() << "Hallo" << 1 << logx::nocp(un) << " wie gehts?" << logx::end[1];
-	logx::end[1];
+	logxERROR("Hallo" << 1 << logx::nocp(un) << " wie gehts?");
 
 	std::cin.get();
 	return 0;
