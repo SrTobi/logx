@@ -7,13 +7,14 @@
 #include <string>
 #include <ostream>
 #include "config.hpp"
+#include "logx/logx_api.hpp"
 #include "details/stream_packs.hpp"
 
 namespace logx {
 
 
 
-	class tag
+	class LOGX_EXPORT tag
 	{
 	public:
 		virtual ~tag() {}
@@ -53,6 +54,10 @@ namespace logx {
 		return _stream;
 	}
 
+#define logxTAG_PACK_OPERATOR(_name)																									\
+	template<typename T> ::logx::details::tag_annotation_pack<_name, T> operator, (_name&& _val, T&& _add)								\
+	{ return ::logx::details::tag_annotation_pack<_name, T>(std::make_tuple(std::move(_val), std::forward<T>(_add))); }			
+
 #define logxTAG(_name, _val_build, ...)																									\
 	struct _name : public logx::parameterized_tag_base<__VA_ARGS__>																		\
 	{																																	\
@@ -61,8 +66,7 @@ namespace logx {
 		inline virtual string _build_value(const tuple_type& _args) const override														\
 		{ return _val_build; }																											\
 	};																																	\
-		template<typename T> ::logx::details::tag_annotation_pack<_name, T> operator, (_name&& _val, T&& _add)							\
-		{ return ::logx::details::tag_annotation_pack<_name, T>(std::make_tuple(std::move(_val), std::forward<T>(_add))); }			
+	logxTAG_PACK_OPERATOR(_name)
 }
 
 
