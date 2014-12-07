@@ -36,7 +36,7 @@ namespace logx {
 			template<typename Base>
 			void push_if_based(std::vector<const Base*>& _target) const
 			{
-				_push_if_based(_target, &mValue);
+				pusher<Base>::_push_if_based(_target, &mValue);
 			}
 
 			void write_to_msg(std::ostringstream& os) const
@@ -45,16 +45,20 @@ namespace logx {
 			}
 
 		private:
-			template<typename Base>
-			static void _push_if_based(std::vector<const Base*>& _target, const Base* _arg)
-			{
-				_target.push_back(_arg);
-			}
 
 			template<typename Base>
-			static void _push_if_based(std::vector<const Base*>& _target, const void* _arg)
+			struct pusher
 			{
-			}
+				template<typename T>
+				static typename std::enable_if<!std::is_base_of<Base, T>::value>::type _push_if_based(std::vector<const Base*>& _target, const T* _arg)
+				{
+				}
+
+				static void _push_if_based(std::vector<const Base*>& _target, const Base* _arg)
+				{
+					_target.push_back(_arg);
+				}
+			};
 
 			static void _add_to_msg(std::ostringstream& _os, const tag& _val)
 			{
