@@ -4,6 +4,7 @@
 
 #include <thread>
 #include <sstream>
+#include "config.hpp"
 #include "details/char_conv.hpp"
 #include "tag.hpp"
 
@@ -108,33 +109,20 @@ namespace logx {
 
 		/**************************************************************************************************/
 		// tag: thread
-		class thread : public tag
+
+		class LOGX_EXPORT std::thread::id;
+		class LOGX_EXPORT thread : public tag
 		{
 		public:
-			thread()
-				: mThreadId(std::this_thread::get_id())
-			{
-			}
+			thread();
+			thread(std::thread::id _id);
 
-			thread(std::thread::id _id)
-				: mThreadId(_id)
-			{
-			}
-
-			virtual string name() const override
-			{
-				return "thread";
-			}
-
-			virtual string value() const override
-			{
-				std::ostringstream stream;
-				stream << mThreadId;
-				return stream.str();
-			}
+			virtual string name() const override;
+			virtual string value() const override;
 		private:
 			const std::thread::id mThreadId;
 		};
+		logxTAG_PACK_OPERATOR(thread);
 
 
 		/**************************************************************************************************/
@@ -145,6 +133,21 @@ namespace logx {
 			),
 			const string /* job */
 		);
+
+		/**************************************************************************************************/
+		// tag: time
+		class LOGX_EXPORT time : public tag
+		{
+		public:
+			time();
+
+			virtual string name() const override;
+			virtual string value() const override;
+
+		private:
+			const int64_t mTime;
+		};
+		logxTAG_PACK_OPERATOR(time);
 	}
 }
 
