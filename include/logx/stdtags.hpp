@@ -10,7 +10,11 @@
 
 
 #ifndef __FUNCTION__
-#	define __FUNCTION__ ""
+#	define __FUNCTION__ "[unknown]"
+#	define _LOGX_NO_FUNCTION
+#	define _LOGX_PRINT_IF_FUNCTION(_v)
+#else
+#	define _LOGX_PRINT_IF_FUNCTION(_v)	_v
 #endif
 
 namespace logx {
@@ -35,45 +39,56 @@ namespace logx {
 
 		/**************************************************************************************************/
 		// tag: source
-		logxTAG(source,
-			(
-			details::trim_file_path(std::get<0>(_args)) + " in "
-			+ std::get<1>(_args) + "(...) at "
-			+ logx::details::std_to_string(std::get<2>(_args))
+		logxTAG_BEGIN(source,
+				(
+				filename() + " in "
+				_LOGX_PRINT_IF_FUNCTION(+ function() + "(...) at ")
+				+ logx::details::std_to_string(line())
 
-			),
-			const char* /* file */,
-			const char* /* function */,
-			unsigned int /* line */
-		)
+				),
+				const char* /* file */,
+				const char* /* function */,
+				size_t		/* line */
+			)
+
+			inline string filename() const { return details::trim_file_path(arg<0>()); }
+			inline const char* filepath() const { return arg<0>(); }
+			inline const char* function() const { return arg<1>(); }
+			inline size_t line() const { return arg<2>(); }
+
+		logxTAG_END(source)
 #define logxSOURCE ::logx::tags::source(__FILE__, __FUNCTION__, __LINE__)
 
 
 		/**************************************************************************************************/
 		// tag: cat
-		logxTAG(cat,
-			(
-				std::get<0>(_args)
-			),
-			const string
-		)
+		logxTAG_BEGIN(cat,
+				(
+					arg<0>()
+				),
+				const string
+			)
+
+			inline const string& category() const { return arg<0>(); }
+
+		logxTAG_END(cat);
 
 		/**************************************************************************************************/
 		// tag: log_level
-		namespace details {
-			enum class _log_level : int8_t
-			{
-				TRACE = 0,
-				DEBUG,
-				DETAIL,
-				INFO,
-				WARNING,
-				ERR,
-				FATAL,
-				_LOGLVL_COUNT
-			};
+		enum class log_levels : int8_t
+		{
+			TRACE = 0,
+			DEBUG,
+			DETAIL,
+			INFO,
+			WARNING,
+			ERR,
+			FATAL,
+			_LOGLVL_COUNT
+		};
 
-			static const char* LogLevelNames[int8_t(_log_level::_LOGLVL_COUNT)] =
+		namespace details {
+			static const char* LogLevelNames[int8_t(log_levels::_LOGLVL_COUNT)] =
 				{
 					"TRACE",
 					"DEBUG",
@@ -91,20 +106,23 @@ namespace logx {
 			}
 		}
 
-		logxTAG(log_level,
-			(
-				details::LogLevelNames[details::to_underlying(std::get<0>(_args))]
-			),
-			details::_log_level
-		)
+		logxTAG_BEGIN(log_level,
+				(
+					details::LogLevelNames[details::to_underlying(arg<0>())]
+				),
+				log_levels
+			)
 
-		static log_level trace(details::_log_level::TRACE);
-		static log_level debug(details::_log_level::DEBUG);
-		static log_level detail(details::_log_level::DETAIL);
-		static log_level info(details::_log_level::INFO);
-		static log_level warning(details::_log_level::WARNING);
-		static log_level error(details::_log_level::ERR);
-		static log_level fatal(details::_log_level::FATAL);
+			inline log_levels level() const { return arg<0>(); }
+		logxTAG_END(log_level)
+
+		static log_level trace(log_levels::TRACE);
+		static log_level debug(log_levels::DEBUG);
+		static log_level detail(log_levels::DETAIL);
+		static log_level info(log_levels::INFO);
+		static log_level warning(log_levels::WARNING);
+		static log_level error(log_levels::ERR);
+		static log_level fatal(log_levels::FATAL);
 		
 
 		/**************************************************************************************************/
@@ -119,6 +137,8 @@ namespace logx {
 
 			virtual string name() const override;
 			virtual string value() const override;
+
+			inline std::thread::id id() const { return mThreadId; }
 		private:
 			const std::thread::id mThreadId;
 		};
@@ -127,12 +147,16 @@ namespace logx {
 
 		/**************************************************************************************************/
 		// tag: job
-		logxTAG(job,
-			(
-			 std::get<0>(_args)
-			),
-			const string /* job */
-		);
+		logxTAG_BEGIN(job,
+				(
+					arg<0>()
+				),
+				const string /* job */
+			)
+
+			inline const string& jobname() const { return arg<0>(); }
+
+		logxTAG_END(job);
 
 		/**************************************************************************************************/
 		// tag: time
