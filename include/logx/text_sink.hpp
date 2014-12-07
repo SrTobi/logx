@@ -23,6 +23,7 @@ namespace logx {
 				: mStream(_stream)
 				, show_category(true)
 				, show_loglevel(true)
+				, show_time(true)
 			{
 			}
 
@@ -31,13 +32,25 @@ namespace logx {
 
 			virtual void on_message(const sink_message& msg)
 			{
-				if (show_category || show_loglevel)
+				if (show_time)
+				{
+					const tags::time* time_tag = msg.get_tag<tags::time>();
+
+					if (time_tag)
+						mStream << '[' << time_tag->value() << ']';
+				}
+
+				if (show_category)
 				{
 					const tags::cat* cat_tag = msg.get_tag<tags::cat>();
-					const tags::log_level* ll_tag = msg.get_tag<tags::log_level>();
 
 					if (cat_tag)
 						mStream << '[' << cat_tag->value() << ']';
+				}
+
+				if (show_loglevel)
+				{
+					const tags::log_level* ll_tag = msg.get_tag<tags::log_level>();
 
 					if (ll_tag)
 						mStream << ll_tag->value() << ':' << ' ';
@@ -48,6 +61,7 @@ namespace logx {
 
 			bool show_category;
 			bool show_loglevel;
+			bool show_time;
 		private:
 			stream_type& mStream;
 		};
