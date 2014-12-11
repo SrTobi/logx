@@ -1,31 +1,125 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8" />
-	<title>Log Viewer</title>
-	<script src="viewer.js" type="text/javascript"></script>
+<meta charset="UTF-8" />
+<title>Log Viewer</title>
+<script src="logs.lst" type="text/javascript"></script>
+<script src="viewer.js" type="text/javascript"></script>
+
+<script type="text/javascript">
 	
-	<script type="text/javascript">
+	function LoadLog(file)
+	{
+		var xml = LoadXmlLog(file);
+		FillContextDiv(document.getElementById("log_script_context"), xml, null);
+	}
+	
+	function RefreshLog()
+	{
+		var e = document.getElementById("log_list");
+		var i = e.selectedIndex;
 		
-		function LoadLog()
-		{
-			var xml = LoadXmlLog("test-log.xml");
-			FillContextDiv(document.getElementById("log_script_context"), xml, null);
-		}
-		
-		
-		
-	</script>
+		var file = e.options[i].value;
+		LoadLog(file);
+	}
+	
+	function Bootstrap()
+	{
+		FillFileList(document.getElementById("log_list"), LOG_FILE_LIST);
+		RefreshLog();
+	}
+	
+</script>
+
+<style type="text/css">
+body {
+	background-color: #EEEEEE;
+	margin-top: 0px;
+	margin-left: 0px;
+}
+
+#main_panel {
+	//min-width: 100%;
+	//overflow:	;
+}
+
+.option_panel {
+	background-color:	#AD8533;
+	padding: 			20px;
+}
+
+.side_panel {
+	margin-bottom:		20px;
+	border-radius:		0 8px 8px 0;
+}
+
+#top_panel {
+	margin:				0px 20% 30px 20%;
+	border-radius:		0 0 8px 8px;
+}
+
+#left_panel {
+	float:				left;
+}
+	
+#log_script_context {
+	display:		flex;
+	flex-wrap: wrap;
+	padding-left:	20px;
+	white-space: nowrap;
+}
+
+#log_script_context > table {
+	flex-grow:		1;
+}
+
+.log_table {
+    border-collapse: collapse;
+	border: 1px solid black;
+	width:			100%;
+}
+
+.log_table td {
+	border: 0px solid black;
+	padding: 2px 10px
+	
+}
+
+.log_table .tagc {
+	max-width: 0px;
+	border-right: 1px solid black;
+}
+
+</style>
 	
 </head>
-<body>
+<body onload="Bootstrap();">
 
-	<input type="button" value="load" onclick="LoadLog()" />
-
-	<div id="log_script_context">
-
+	<div id="top_panel" class="option_panel">
+		<select id="log_list" onchange="RefreshLog();">
+		</select>	
 	</div>
+	
+	<div id="main_panel">
+		<div id="left_panel">
+			<div id="thread_selection_context" class="side_panel option_panel">
+				thread-context
+			</div>
+			
+			<div id="include_filter_context" class="side_panel option_panel">
+			incl_filter
+			</div>
+			
+			<div id="exclude_filter_context" class="side_panel option_panel">
+				excl_filter
+			</div>
+		</div>
+		
+		<!-- Context for the log entries -->
+		<div id="log_script_context">
 
+		</div>
+	</div>
 
 
 </body>

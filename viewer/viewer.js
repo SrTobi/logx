@@ -27,6 +27,17 @@ function GetLogLevelColor(lvl)
 	return color;
 }
 
+function FillFileList(e, filelist)
+{
+	for(i = filelist.length - 1; i >= 0; --i)
+	{
+		var f = filelist[i];
+		var optElem = document.createElement("option");
+		optElem.innerHTML = f;
+		e.appendChild(optElem);
+	}
+}
+
 
 function LoadXmlLog(filename)
 {
@@ -42,36 +53,60 @@ function LoadXmlLog(filename)
 	return xmlDoc;
 }
 
+
+function Attr_LogLevel(row, value, options)
+{
+	var color = GetLogLevelColor(value);
+	row.style.backgroundColor = color;
+	var cell = row.insertCell();
+	cell.innerHTML = value;
+	cell.className = value + "_TAGC tagc";
+}
+
+function ApplyTagFunctorList(list, msg, row, options)
+{
+	list.forEach(function (paf)
+	{
+		var tags = msg.getElementsByTagName("tag");
+		for(j = 0; j < tags.length; ++j)
+		{
+			var tag = tags[j];
+			
+			if(tag.attributes.getNamedItem("name").nodeValue == paf[0])
+			{
+				paf[1](row, tag.childNodes[0].nodeValue, options);
+			}
+		}
+	});
+}
+
 function FillContextDiv(context, xmllog, options)
 {
 	context.innerHTML = "";
 	
 	var tbl = 	document.createElement('table');
-	tbl.style.width='100%';
-	tbl.setAttribute('border','1');
+	tbl.setAttribute('class','log_table');
 	var rnode = xmllog.getElementsByTagName("log")[0];
 	var entries = rnode.getElementsByTagName("entry");
+	
+	
+	var pre_attribute_functors = [
+		["log_level", Attr_LogLevel]
+	
+	];
 	
 	for(i = 0; i < entries.length; ++i)
 	{
 		var entry = entries[i];
 		var row = tbl.insertRow();
-		var cell = row.insertCell();
 		
+		
+		ApplyTagFunctorList(pre_attribute_functors, entry, row, options);
+		
+		var cell = row.insertCell();
 		var logmsg = entry.getElementsByTagName("msg")[0].childNodes[0].nodeValue;
 		
-		
-		var tags = entry.getElementsByTagName("tag");
-		for(j = 0; j < tags.length; ++j)
-		{
-			var tag = tags[j];
-			
-			if(tag.attributes.getNamedItem("name").nodeValue == "log_level")
-			{
-				var color = GetLogLevelColor(tag.childNodes[0].nodeValue);
-				cell.style.backgroundColor = color;
-			}
-		}
+		//ApplyTagFunctorList
 		
 		cell.appendChild(document.createTextNode(logmsg));
 	}

@@ -1,0 +1,3 @@
+var LOG_FILE_LIST = new Array();
+LOG_FILE_LIST.push("test-log.xml");
+LOG_FILE_LIST.push("test-log2.xml");

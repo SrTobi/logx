@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<log>
+	<entry>
+		<msg>here comes a string: [jan =&gt; 34, tally =&gt; 23, tobi =&gt; 22]</msg>
+		<tag name="cat">test</tag>
+		<tag name="time">22:02:17</tag>
+		<tag name="source">simple.cpp in main(...) at 49</tag>
+		<tag name="thread">6524</tag>
+		<tag name="log_level">INFO</tag>
+	</entry>
+	<entry>
+		<msg>here comes a string again: 1[uncopyable]bye</msg>
+		<tag name="time">22:02:17</tag>
+		<tag name="source">simple.cpp in main(...) at 54</tag>
+		<tag name="thread">6524</tag>
+		<tag name="log_level">WARN</tag>
+	</entry>
+	<entry>
+		<msg>Hallo &quot;tobi&quot;1[uncopyable] wie gehts?</msg>
+		<tag name="time">22:02:17</tag>
+		<tag name="source">simple.cpp in main(...) at 56</tag>
+		<tag name="thread">6524</tag>
+		<tag name="log_level">ERR</tag>
+	</entry>
+	<entry>
+		<msg>here comes a string: [jan =&gt; 34, tally =&gt; 23, tobi =&gt; 22]</msg>
+		<tag name="cat">test</tag>
+		<tag name="time">22:02:17</tag>
+		<tag name="source">simple.cpp in main(...) at 49</tag>
+		<tag name="thread">6524</tag>
+		<tag name="log_level">INFO</tag>
+	</entry>
+	<entry>
+		<msg>here comes a string again: 1[uncopyable]bye</msg>
+		<tag name="time">22:02:17</tag>
+		<tag name="source">simple.cpp in main(...) at 54</tag>
+		<tag name="thread">6524</tag>
+		<tag name="log_level">WARN</tag>
+	</entry>
+	<entry>
+		<msg>Hallo &quot;tobi&quot;1[uncopyable] wie gehts?</msg>
+		<tag name="time">22:02:17</tag>
+		<tag name="source">simple.cpp in main(...) at 56</tag>
+		<tag name="thread">6524</tag>
+		<tag name="log_level">ERR</tag>
+	</entry>
+	<entry>
+		<msg>here comes a string: [jan =&gt; 34, tally =&gt; 23, tobi =&gt; 22]</msg>
+		<tag name="cat">test</tag>
+		<tag name="time">22:02:17</tag>
+		<tag name="source">simple.cpp in main(...) at 49</tag>
+		<tag name="thread">6524</tag>
+		<tag name="log_level">TRACE</tag>
+	</entry>
+	<entry>
+		<msg>here comes a string again: 1[uncopyable]bye</msg>
+		<tag name="time">22:02:17</tag>
+		<tag name="source">simple.cpp in main(...) at 54</tag>
+		<tag name="thread">6524</tag>
+		<tag name="log_level">DEBUG</tag>
+	</entry>
+	<entry>
+		<msg>Hallo &quot;tobi&quot;1[uncopyable] wie gehts?</msg>
+		<tag name="time">22:02:17</tag>
+		<tag name="source">simple.cpp in main(...) at 56</tag>
+		<tag name="thread">6524</tag>
+		<tag name="log_level">DETAIL</tag>
+	</entry>
+	<entry>
+		<msg>here comes a string: [jan =&gt; 34, tally =&gt; 23, tobi =&gt; 22]</msg>
+		<tag name="cat">test</tag>
+		<tag name="time">22:02:17</tag>
+		<tag name="source">simple.cpp in main(...) at 49</tag>
+		<tag name="thread">6524</tag>
+		<tag name="log_level">FATAL</tag>
+	</entry>
+	<entry>
+		<msg>here comes a string again: 1[uncopyable]bye</msg>
+		<tag name="time">22:02:17</tag>
+		<tag name="source">simple.cpp in main(...) at 54</tag>
+		<tag name="thread">6524</tag>
+		<tag name="log_level">WARN</tag>
+	</entry>
+	<entry>
+		<msg>Hallo &quot;tobi&quot;1[uncopyable] wie gehts?</msg>
+		<tag name="time">22:02:17</tag>
+		<tag name="source">simple.cpp in main(...) at 56</tag>
+		<tag name="thread">6524</tag>
+		<tag name="log_level">ERR</tag>
+	</entry>
+</log>
