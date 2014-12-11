@@ -63,10 +63,18 @@ function Attr_LogLevel(row, value, options)
 	cell.className = value + "_TAGC tagc";
 }
 
+function Attr_Cat(row, value, options)
+{
+	var cell = row.insertCell();
+	cell.innerHTML = value;
+	cell.className = "hascat";
+}
+
 function ApplyTagFunctorList(list, msg, row, options)
 {
 	list.forEach(function (paf)
 	{
+		var tagVal = null;
 		var tags = msg.getElementsByTagName("tag");
 		for(j = 0; j < tags.length; ++j)
 		{
@@ -74,9 +82,13 @@ function ApplyTagFunctorList(list, msg, row, options)
 			
 			if(tag.attributes.getNamedItem("name").nodeValue == paf[0])
 			{
-				paf[1](row, tag.childNodes[0].nodeValue, options);
+				found = true;
+				tagVal = tag.childNodes[0].nodeValue;
+				break;
 			}
 		}
+		
+		paf[1](row, tagVal, options);
 	});
 }
 
@@ -91,8 +103,8 @@ function FillContextDiv(context, xmllog, options)
 	
 	
 	var pre_attribute_functors = [
-		["log_level", Attr_LogLevel]
-	
+		["log_level", Attr_LogLevel],
+		["cat", Attr_Cat]
 	];
 	
 	for(i = 0; i < entries.length; ++i)
@@ -105,6 +117,7 @@ function FillContextDiv(context, xmllog, options)
 		
 		var cell = row.insertCell();
 		var logmsg = entry.getElementsByTagName("msg")[0].childNodes[0].nodeValue;
+		cell.className = "msgcol";
 		
 		//ApplyTagFunctorList
 		
