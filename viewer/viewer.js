@@ -57,10 +57,34 @@ function LoadXmlLog(filename)
 function Attr_LogLevel(row, value, options)
 {
 	var color = GetLogLevelColor(value);
-	row.style.backgroundColor = color;
 	var cell = row.insertCell();
+	cell.style.backgroundColor = color;
 	cell.innerHTML = value;
 	cell.className = value + "_TAGC tagc";
+}
+
+function Attr_Time(row, value, options)
+{
+	var color = GetLogLevelColor(value);
+	var cell = row.insertCell();
+	cell.innerHTML = value;
+	cell.className = "timetag";
+}
+
+function Attr_Thread(row, value, options)
+{
+	var color = GetLogLevelColor(value);
+	var cell = row.insertCell();
+	cell.innerHTML = value;
+	cell.className = "threadtag";
+}
+
+function Attr_Source(row, value, options)
+{
+	var color = GetLogLevelColor(value);
+	var cell = row.insertCell();
+	cell.innerHTML = value;
+	cell.className = "srctag";
 }
 
 function Attr_Cat(row, value, options)
@@ -104,7 +128,13 @@ function FillContextDiv(context, xmllog, options)
 	
 	var pre_attribute_functors = [
 		["log_level", Attr_LogLevel],
+		["time", Attr_Time],
 		["cat", Attr_Cat]
+	];
+	
+	var post_attribute_functors = [
+		["thread", Attr_Thread],
+		["source", Attr_Source]
 	];
 	
 	for(i = 0; i < entries.length; ++i)
@@ -112,12 +142,15 @@ function FillContextDiv(context, xmllog, options)
 		var entry = entries[i];
 		var row = tbl.insertRow();
 		
+		row.className = (i % 2 == 0) ? "even" : "odd";
 		
 		ApplyTagFunctorList(pre_attribute_functors, entry, row, options);
 		
 		var cell = row.insertCell();
 		var logmsg = entry.getElementsByTagName("msg")[0].childNodes[0].nodeValue;
 		cell.className = "msgcol";
+		
+		ApplyTagFunctorList(post_attribute_functors, entry, row, options);
 		
 		//ApplyTagFunctorList
 		
