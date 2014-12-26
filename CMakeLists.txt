@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.8 )
+cmake_minimum_required( VERSION 3.0 )
 
 project(logx VERSION 0.1)
 set(Project_SHORTCUT "logx")
@@ -20,3 +20,7 @@ buildx_debug("public includes: ${LOGX_PUBLIC_INCLUDES}" proj)
 
 add_subdirectory("src")
 add_subdirectory("samples")
+
+
+buildx_install_package(	EXPORT logxTargets
+						NAMESPACE x::)
