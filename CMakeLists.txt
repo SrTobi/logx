@@ -1,6 +1,6 @@
 include(biicode/boost/setup)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/generated_includes)
+
 SET(BII_LIB_TYPE SHARED)
 ADD_BII_TARGETS()
 
@@ -10,6 +10,7 @@ generate_export_header(${BII_LIB_TARGET}
 							EXPORT_FILE_NAME "${CMAKE_CURRENT_BINARY_DIR}/generated_includes/logx/logx_api.hpp"
 							BASE_NAME "LOGX"
             )
+target_include_directories(${BII_BLOCK_TARGET} INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/generated_includes)
 
 
 bii_find_boost(COMPONENTS unit_test_framework REQUIRED)
