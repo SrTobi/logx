@@ -1,4 +1,6 @@
 build/
+bin/
+bii/
 
 # tempfiles
 *.swp
