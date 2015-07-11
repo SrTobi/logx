@@ -8,6 +8,8 @@
 #include <functional>
 #include <utility>
 
+#include <utilx/finally.hpp>
+
 #include <boost/lockfree/queue.hpp>
 
 #include "logx/core.hpp"
@@ -22,25 +24,6 @@
 namespace logx {
 
 	namespace impl {
-
-		struct finally
-		{
-			template<typename Handler>
-			finally(Handler handler)
-				: mHandler(handler)
-			{
-			}
-
-			~finally()
-			{
-				mHandler();
-			}
-
-		private:
-			std::function<void()> mHandler;
-		};
-
-
 		class core_impl final : public core
 		{
 		public:
@@ -137,7 +120,7 @@ namespace logx {
 			void _worker_run()
 			{
 				mIsRunning = true;
-				finally fin = [this]()
+				utilx::finally fin = [this]()
 				{
 					mIsRunning = false;
 				};
