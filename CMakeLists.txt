@@ -18,6 +18,8 @@ set(LOGX_PUBLIC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 buildx_scan(LOGX_PUBLIC_INCLUDES ${LOGX_PUBLIC_INCLUDE_DIR} "hpp")
 buildx_debug("public includes: ${LOGX_PUBLIC_INCLUDES}" proj)
 
+find_package(utilx REQUIRED)
+
 add_subdirectory("src")
 add_subdirectory("samples")
 

@@ -9,6 +9,7 @@
 #include <utility>
 
 #include <boost/lockfree/queue.hpp>
+#include <utilx/finally.hpp>
 
 #include "logx/core.hpp"
 #include "logx/sink.hpp"
@@ -22,24 +23,6 @@
 namespace logx {
 
 	namespace impl {
-
-		struct finally
-		{
-			template<typename Handler>
-			finally(Handler handler)
-				: mHandler(handler)
-			{
-			}
-
-			~finally()
-			{
-				mHandler();
-			}
-
-		private:
-			std::function<void()> mHandler;
-		};
-
 
 		class core_impl final : public core
 		{
@@ -137,7 +120,7 @@ namespace logx {
 			void _worker_run()
 			{
 				mIsRunning = true;
-				finally fin = [this]()
+				utilx::finally fin = [this]()
 				{
 					mIsRunning = false;
 				};
