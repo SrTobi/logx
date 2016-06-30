@@ -49,8 +49,8 @@ namespace logx {
 			template<typename Base>
 			struct pusher
 			{
-				template<typename T>
-				static typename std::enable_if<!std::is_base_of<Base, T>::value>::type _push_if_based(std::vector<const Base*>& _target, const T* _arg)
+				template<typename T2>
+				static typename std::enable_if<!std::is_base_of<Base, T2>::value>::type _push_if_based(std::vector<const Base*>& _target, const T2* _arg)
 				{
 				}
 
@@ -76,11 +76,11 @@ namespace logx {
 			T mValue;
 		};
 
-		template<typename T>
-		class list_message_element_wrapper<uncopyable_element_wrapper<T> >
+		template<typename T2>
+		class list_message_element_wrapper<uncopyable_element_wrapper<T2> >
 		{
 		public:
-			list_message_element_wrapper(const uncopyable_element_wrapper<T>& _arg)
+			list_message_element_wrapper(const uncopyable_element_wrapper<T2>& _arg)
 			{
 				using namespace additional_streams;
 				std::ostringstream os;
