@@ -129,7 +129,7 @@ namespace logx {
 		/**************************************************************************************************/
 		// tag: thread
 
-		class LOGX_EXPORT std::thread::id;
+		//class LOGX_EXPORT std::thread::id;
 		class LOGX_EXPORT thread : public tag
 		{
 		public:
