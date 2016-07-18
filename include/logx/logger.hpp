@@ -116,10 +116,10 @@ namespace logx {
 		{
 		}
 
-		logger(std::tuple<_Args...>&& _args)
+		/*explicit logger(std::tuple<_Args...>&& _args)
 			: mArgs(std::move(_args))
 		{
-		}
+		}*/
 
 		inline details::stream_pack<std::tuple<_Args...>> log()
 		{
