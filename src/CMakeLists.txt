@@ -37,4 +37,4 @@ buildx_target_includes(	TARGETS logx
 
 buildx_add_external_test(external-test ${PROJECT_SOURCE_DIR}/tests/interface TEST_TARGETS logx)
 buildx_add_internal_test(internal-test ${PROJECT_SOURCE_DIR}/tests/internal TEST_TARGET logx)
-target_link_libraries(internal-test ${Boost_LIBRARIES} x::utilx)
+target_link_libraries(internal-test ${Boost_LIBRARIES} Threads::Threads x::utilx)
