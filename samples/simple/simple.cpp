@@ -46,14 +46,13 @@ int main()
 
 	logx::logger<logx::tags::cat> logger { "test" };
 
-	logger.logxINFO("here comes a string: " << logx::mapped(ages.begin(), ages.end()));
+	logger << logxINFO("here comes a string: " << logx::quantum(xx.begin(), xx.end())); // << logx::sequenced(vec.begin(), vec.end()));
 
 	//logx::log("here comes a string: " << 1.0f << ", test, " << L"wie gehts");
 
 	uncopyable un;
-	logx::logxWARN("here comes a string again: 1" << logx::nocp(un) << "bye");
-
-	logx::logxERROR("Hallo \"tobi\"" << 1 << logx::nocp(un) << " wie gehts?");
+	logxWARN("here comes a string again: 1" << logx::nocp(un) << "bye");
+	logxERROR("Hallo \"tobi\"" << 1 << logx::nocp(un) << " wie gehts?");
 
 	std::cin.get();
 	return 0;

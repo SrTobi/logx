@@ -9,29 +9,13 @@
 
 #ifndef LOGX_NO_LOG_MARCOS
 
-struct logx_call_helper
-{
-	static inline logx::details::stream_pack<> log()
-	{
-		return ::logx::log();
-	}
-
-	static inline logx::details::stream_pack_end<> dummy()
-	{
-		return ::logx::details::stream_pack_end<>();
-	}
-};
 
 
-
-
-
-
-#define logxRAWLOG(...)		log() << __VA_ARGS__ << ::logx::end
+#define logxRAWLOG(...)		logx::log() << __VA_ARGS__ << ::logx::end
 #define logxLOG(...)		logxRAWLOG(__VA_ARGS__)[::logx::tags::time(), logxSOURCE, ::logx::tags::thread()]
 
 #ifdef LOGX_PUBLISH
-#	define logxTRACE(...)	logx_call_helper::dummy()
+#	define logxTRACE(...)	logx::dummy()
 #else
 #	define logxTRACE(...)	logxLOG(__VA_ARGS)[::logx::tags::trace]
 #endif
