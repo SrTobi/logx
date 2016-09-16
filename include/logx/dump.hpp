@@ -108,18 +108,18 @@ namespace std {
 	{
 		auto begin = _it.begin();
 		auto end = _it.end();
-		_stream << Ch('[');
+		_stream << Ch('{');
 		if (begin != end)
 		{
-			_stream << *begin << Ch(' ') << Ch('=') << Ch('>') << Ch(' ');
+			_stream << *begin;
 
 			while (++begin != end)
 			{
-				_stream << *begin << Ch(' ') << Ch('=') << Ch('>') << Ch(' ');
+				_stream << Ch(',') << Ch(' ');
 				_stream << *begin;
 			}
 		}
-		_stream << Ch(']');
+		_stream << Ch('}');
 		return _stream;
 	}
 }
