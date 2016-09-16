@@ -49,16 +49,34 @@ namespace logx {
 		return details::container_arg<typename std::iterator_traits<Iter>::value_type, details::map_iterator_tag>(_begin, _end);
 	}
 
+	template<typename Container>
+	details::container_arg<typename Container::value_type, details::map_iterator_tag> mapped(const Container& container)
+	{
+		return mapped(std::begin(container), std::end(container));
+	}
+
 	template<typename Iter>
 	details::container_arg<typename std::iterator_traits<Iter>::value_type, details::sequence_iterator_tag> sequenced(Iter _begin, Iter _end)
 	{
 		return details::container_arg<typename std::iterator_traits<Iter>::value_type, details::sequence_iterator_tag>(_begin, _end);
 	}
 
+	template<typename Container>
+	details::container_arg<typename Container::value_type, details::sequence_iterator_tag> sequenced(const Container& container)
+	{
+		return sequenced(std::begin(container), std::end(container));
+	}
+
 	template<typename Iter>
 	details::container_arg<typename std::iterator_traits<Iter>::value_type, details::set_iterator_tag> quantum(Iter _begin, Iter _end)
 	{
 		return details::container_arg<typename std::iterator_traits<Iter>::value_type, details::set_iterator_tag>(_begin, _end);
+	}
+
+	template<typename Container>
+	details::container_arg<typename Container::value_type, details::set_iterator_tag> quantum(const Container& container)
+	{
+		return quantum(std::begin(container), std::end(container));
 	}
 }
 
