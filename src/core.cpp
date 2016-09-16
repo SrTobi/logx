@@ -16,6 +16,7 @@
 #include "logx/tag.hpp"
 #include "logx/sinks/text_sink.hpp"
 #include <logx/logx_api.hpp>
+#include <boost/assert.hpp>
 
 #include "sink_message.hpp"
 #include "memory.hpp"
@@ -29,7 +30,7 @@ namespace logx {
 		public:
 			core_impl()
 				: mMessageQueue(0)
-				, mShouldRun(true)
+				, mShouldRun(false)
 				, mIsRunning(false)
 				, mShouldFlush(false)
 				, mInits(0)
@@ -69,12 +70,14 @@ namespace logx {
 			virtual void init() override
 			{
 				std::lock_guard<std::mutex> lock(mSinkMutex);
-				if (!mIsRunning && mShouldRun)
+				mShouldRun = true;
+				mShouldFlush = false;
+				if (!mIsRunning)
 				{
 					mWorkerThread = std::thread(std::bind(&core_impl::_worker_run, this));
 
 					// spinlock until worker is running
-					while (!mIsRunning && mShouldRun) {}
+					while (!mIsRunning) {}
 				}
 
 				++mInits;
@@ -82,22 +85,27 @@ namespace logx {
 
 			virtual void exit(bool force) override
 			{
-				if (--mInits > 0)
-					return;
-
-				if (mIsRunning)
 				{
-					mShouldFlush = true;
-					if (force)
-						mShouldRun = false;
+					std::lock_guard<std::mutex> lock(mSinkMutex);
+					if (--mInits > 0)
+						return;
+					
+					// mInits should not be < 0
+					BOOST_ASSERT(mInits >= 0);
+					mInits = 0;
 
-					while (mIsRunning)
+					if (mIsRunning)
 					{
-						std::this_thread::sleep_for(std::chrono::milliseconds(1));
+						mShouldFlush = true;
+						if (force)
+							mShouldRun = false;
 					}
 				}
 
-				remove_all_sinks();
+				while (mIsRunning)
+				{
+					std::this_thread::yield();
+				}
 			}
 		protected:
 			virtual std::shared_ptr<tag> _add_default_tag(const std::type_info& _ty, const std::shared_ptr<tag>& _tag) override
@@ -129,15 +137,15 @@ namespace logx {
 				{
 					details::message_base* msg;
 
-					int spin_locked = 0;
+					unsigned int spin_locked = 0;
 					while (!mMessageQueue.pop(msg))
 					{
-						if (mShouldFlush)
-							return;
 
 						if (spin_locked > 100)
 						{
-							std::this_thread::sleep_for(std::chrono::milliseconds(std::min(spin_locked / 100, 500)));
+							if(mShouldFlush)
+								return;
+							std::this_thread::sleep_for(std::chrono::milliseconds(std::min(spin_locked / 100, 100u)));
 						}
 						else{
 							std::this_thread::yield();
@@ -177,10 +185,9 @@ namespace logx {
 
 			virtual void _post_message(details::message_base* message) override
 			{
-				if (mThreaded)
+				if (mIsRunning && !mShouldFlush)
 				{
-					if (!mShouldFlush)
-						mMessageQueue.push(message);
+					mMessageQueue.push(message);
 				}
 				else{
 					_send_message_to_sink(message);
@@ -201,8 +208,7 @@ namespace logx {
 			std::atomic<bool> mShouldRun;
 			std::atomic<bool> mIsRunning;
 			std::atomic<bool> mShouldFlush;
-			std::atomic<unsigned int> mInits;
-			bool mThreaded = false;
+			std::atomic<int> mInits;
 
 			boost::lockfree::queue<details::message_base*> mMessageQueue;
 		};
