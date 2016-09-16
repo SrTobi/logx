@@ -1,8 +1,12 @@
 #include <testx/testx.hpp>
+#include <map>
+#include <set>
+#include <vector>
 #include <iomanip>
 #include "../test_sinks.hpp"
 #include <logx.hpp>
 #include <logx/core.hpp>
+#include <logx/dump.hpp>
 
 struct uncopyable
 {
@@ -185,6 +189,37 @@ struct SinkInitFixture
 		BOOST_CHECK(!allab.wasCopyInit());
 		BOOST_CHECK(!allab.wasMoveInit());
 	}
+
+	void check_map_logging()
+	{
+		std::map<std::string, int> map;
+		map["a"] = 1;
+		map["b"] = 2;
+		map["c"] = 3;
+
+		logx::log() << logx::mapped(map) << logx::end;
+		check("{a => 1, b => 2, c => 3}");
+	}
+
+	void check_seq_logging()
+	{
+		std::vector<int> vec = {
+			1, 2, 3, 4
+		};
+
+		logx::log() << logx::sequenced(vec) << logx::end;
+		check("[1, 2, 3, 4]");
+	}
+
+	void check_quantum_logging()
+	{
+		std::set<int> set = {
+			1, 2, 3, 4
+		};
+
+		logx::log() << logx::quantum(set) << logx::end;
+		check("{1, 2, 3, 4}");
+	}
 };
 
 
@@ -198,4 +233,7 @@ TESTX_START_FIXTURE_TEST(SinkInitFixture)
 	TESTX_FIXTURE_TEST(check_copy_logging);
 	TESTX_FIXTURE_TEST(check_move_logging);
 	TESTX_FIXTURE_TEST(check_nocopy_logging);
+	TESTX_FIXTURE_TEST(check_map_logging);
+	TESTX_FIXTURE_TEST(check_seq_logging);
+	TESTX_FIXTURE_TEST(check_quantum_logging);
 TESTX_END_FIXTURE_TEST();
