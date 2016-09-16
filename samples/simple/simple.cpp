@@ -53,7 +53,11 @@ int main()
 	ages["jan"] = 34;
 	std::vector<int> vec = { 1, 2, 3 };
 
-	logx::logger<logx::tags::cat> logger { "test" };
+	logx::logger<logx::tags::cat> logger("test");
+	auto joblogger = logger.with(logx::tags::job("job"));
+
+
+	joblogger << logxINFO("test")[logx::tags::cat("xxx")];
 
 	Point p{3, 4};
 	logger << logxINFO("here comes a string: " << logx::quantum(xx.begin(), xx.end())); // << logx::sequenced(vec.begin(), vec.end()));

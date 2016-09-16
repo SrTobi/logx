@@ -171,8 +171,14 @@ namespace logx {
 	public:
 		typedef std::tuple<_Args...> prepack_type;
 
-		logger(_Args&&... _args)
+		explicit logger(_Args&&... _args)
 			: mArgs(std::forward<_Args>(_args)...)
+		{
+		}
+
+		template<typename... LoggerArgs, typename... NewArgs>
+		explicit logger(const logger<LoggerArgs...>& _logger, NewArgs&&... _newa)
+			: mArgs(std::tuple_cat(_logger.args(), std::make_tuple(_newa...)))
 		{
 		}
 
@@ -180,6 +186,17 @@ namespace logx {
 		inline details::stream_pack<prepack_type, _StreamArgs...> operator << (details::stream_pack<std::tuple<>, _StreamArgs...>&& _stream)
 		{
 			return details::stream_pack<prepack_type, _StreamArgs...>(mArgs, std::move(_stream.mArgs));
+		}
+
+		template<typename... _WithArgs>
+		inline logger<_Args..., _WithArgs...> with(_WithArgs&&... _args) const
+		{
+			return logger<_Args..., _WithArgs...>(*this, std::forward<_WithArgs>(_args)...);
+		}
+
+		const std::tuple<_Args...>& args() const
+		{
+			return mArgs;
 		}
 
 	private:
