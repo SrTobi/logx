@@ -3,6 +3,7 @@
 #define _LOGX_LOGGER_HPP
 
 #include <tuple>
+#include <type_traits>
 #include "config.hpp"
 #include "core.hpp"
 #include "details/list_message.hpp"
@@ -74,19 +75,25 @@ namespace logx {
 			template<typename... _FriendArgs>
 			friend class ::logx::logger;
 
-			stream_pack(PrePack _prePack)
-				: mPrePack(std::move(_prePack))
+			typedef std::tuple<_Args...> args_type;
+
+			template<typename PPrePack>
+			stream_pack(PPrePack&& _prePack)
+				: mPrePack(std::forward<PPrePack>(_prePack))
 			{}
 
-			stream_pack(PrePack _prePack, std::tuple<_Args...> _args)
-				: mArgs(std::move(_args))
-				, mPrePack(std::move(_prePack))
+			template<typename PPrePack, typename ArgTuple>
+			stream_pack(PPrePack&& _prePack, ArgTuple&& _args)
+				: mPrePack(std::forward<PPrePack>(_prePack))
+				, mArgs(std::forward<ArgTuple>(_args))
 			{
 			}
 
 			template<typename NewA>
 			stream_pack<PrePack, _Args..., NewA> operator << (NewA&& _newa)
 			{
+				//static_assert(std::is_copy_constructible<typename std::decay<NewA>::type>::value, "");
+				//static_assert(std::is_move_constructible<NewA>::value,"" );
 				return stream_pack<PrePack, _Args..., NewA>(std::move(mPrePack), std::tuple_cat(std::move(mArgs), std::forward_as_tuple(std::forward<NewA>(_newa))));
 			}
 
@@ -114,11 +121,11 @@ namespace logx {
 			void _send_message(std::tuple<_AArgs...>&& _msg_args, seq<_Seq...>) const
 			{
 				core::get_core()
-					.add_log_message<details::list_message<sizeof...(_AArgs), _AArgs...>>(std::move(std::get<_Seq>(_msg_args))...);
+					.add_log_message<details::list_message<sizeof...(_AArgs), _AArgs...>>(std::forward<_AArgs>(std::get<_Seq>(_msg_args))...);
 			}
 
 			PrePack mPrePack;
-			std::tuple<_Args...> mArgs;
+			args_type mArgs;
 		};
 
 		struct dummy_stream_pack
@@ -128,6 +135,12 @@ namespace logx {
 			{
 				return *this;
 			}
+		};
+
+		template<typename T>
+		struct uncopyable_element_wrapper
+		{
+			const T& value;
 		};
 	}
 
@@ -172,9 +185,15 @@ namespace logx {
 	private:
 		const std::tuple<_Args...> mArgs;
 	};
+}
 
 
 
+template<typename Ch, typename T>
+std::basic_ostream<Ch>& operator << (std::basic_ostream<Ch>& os, const logx::details::uncopyable_element_wrapper<T>& c)
+{
+	os << c.value;
+	return os;
 }
 
 #endif

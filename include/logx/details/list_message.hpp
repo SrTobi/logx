@@ -18,13 +18,7 @@ namespace logx {
 	namespace details {
 
 
-		template<typename T>
-		struct uncopyable_element_wrapper
-		{
-			const T& value;
-		};
-
-		template<typename T>
+		template<typename T, bool Copyable = std::is_copy_constructible<typename std::decay<T>::type>::value>
 		class list_message_element_wrapper
 		{
 		public:
@@ -77,14 +71,14 @@ namespace logx {
 		};
 
 		template<typename T2>
-		class list_message_element_wrapper<uncopyable_element_wrapper<T2> >
+		class list_message_element_wrapper<T2, false>
 		{
 		public:
-			list_message_element_wrapper(const uncopyable_element_wrapper<T2>& _arg)
+			list_message_element_wrapper(const T2& _arg)
 			{
 				using namespace additional_streams;
 				std::ostringstream os;
-				os << _arg.value;
+				os << _arg;
 				mMsgValue = os.str();
 			}
 
@@ -101,8 +95,6 @@ namespace logx {
 		private:
 			std::string mMsgValue;
 		};
-
-
 
 
 		template<std::size_t _ACount, typename... _Args>
