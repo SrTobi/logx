@@ -27,12 +27,12 @@ namespace logx {
 
 			typename std::vector<T>::const_iterator begin() const
 			{
-				return mData.begin();
+				return mData.cbegin();
 			}
 
 			typename std::vector<T>::const_iterator end() const
 			{
-				return mData.end();
+				return mData.cend();
 			}
 		private:
 			std::vector<T> mData;
