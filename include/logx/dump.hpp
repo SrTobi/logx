@@ -88,7 +88,7 @@ namespace std {
 	{
 		auto begin = _it.begin();
 		auto end = _it.end();
-		_stream << Ch('[');
+		_stream << Ch('{');
 		if (begin != end)
 		{
 			_stream << begin->first << Ch(' ') << Ch('=') << Ch('>') << Ch(' ') << begin->second;
@@ -99,7 +99,7 @@ namespace std {
 				_stream << begin->first << Ch(' ') << Ch('=') << Ch('>') << Ch(' ') << begin->second;
 			}
 		}
-		_stream << Ch(']');
+		_stream << Ch('}');
 		return _stream;
 	}
 
