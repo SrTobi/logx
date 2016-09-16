@@ -21,20 +21,30 @@ private:
 	std::mutex xx;
 };
 
+struct Point
+{
+	int x, y;
+};
+
 std::ostream& operator << (std::ostream& os, const uncopyable& c)
 {
 	os << "[uncopyable]";
 	return os;
 }
 
+std::ostream& operator << (std::ostream& os, const Point& p)
+{
+	os << "(" << p.x << "," << p.y << ")";
+	return os;
+}
 
 int main()
 {
 	logx::backend logbackend;
 
 	logx::core::get_core().remove_all_sinks();
-	auto sink = std::make_shared<logx::xml_sink<>>(std::cout);
-	logx::core::get_core().add_sink(std::bind(&logx::xml_sink<>::on_message, sink, std::placeholders::_1));
+	auto sink = std::make_shared<logx::text_sink>(std::cout);
+	logx::core::get_core().add_sink(std::bind(&logx::text_sink::on_message, sink, std::placeholders::_1));
 
 	std::set<float> xx = { 4.0f, 9.3f, 8.4f };
 	std::map<std::string, int> ages;
@@ -43,10 +53,11 @@ int main()
 	ages["jan"] = 34;
 	std::vector<int> vec = { 1, 2, 3 };
 
-
 	logx::logger<logx::tags::cat> logger { "test" };
 
+	Point p{3, 4};
 	logger << logxINFO("here comes a string: " << logx::quantum(xx.begin(), xx.end())); // << logx::sequenced(vec.begin(), vec.end()));
+	logger << logxINFO("p: " << p);
 
 	//logx::log("here comes a string: " << 1.0f << ", test, " << L"wie gehts");
 
